@@ -14,8 +14,8 @@ import java.util.Properties;
 public class EmailService {
     private final String SMTP_HOST = "smtp.gmail.com";
     private final int SMTP_PORT = 587;
-    private final String SMTP_USERNAME = "am491762@gmail.com";
-    private final String SMTP_PASSWORD = "inniksjjmzirewyj";
+    private final String SMTP_USERNAME = "EventManagementSystem.Team@gmail.com";
+    private final String SMTP_PASSWORD = "xkprrcicoruevtyh";
 
     /**
      * Sends an email to the specified recipient.
