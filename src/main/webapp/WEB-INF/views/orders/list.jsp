@@ -25,26 +25,28 @@
     </c:when>
     <c:otherwise>
       <div class="list-group">
-        <c:forEach items="${orders}" var="order">
+        <c:forEach items="${orders}" var="order" varStatus="loop">
           <a href="${pageContext.request.contextPath}/orders/${order.orderId}" class="list-group-item list-group-item-action">
             <div class="d-flex justify-content-between align-items-center">
               <div>
-                <h5>Order #${order.orderId}</h5>
+                <h5>Order ${loop.index + 1}</h5>
+                <small class="text-muted">ID: ${order.orderId}</small>
                 <p class="mb-1">Date: ${order.formattedOrderDate}</p>
                 <p class="mb-1">Items: ${order.orderItems.size()}</p>
               </div>
               <div class="text-end">
                 <h5>$<fmt:formatNumber value="${order.totalAmount}" pattern="#,##0.00"/></h5>
                 <span class="badge
-                  ${order.status eq 'COMPLETED' ? 'badge-success' :
-                  order.status eq 'PENDING' ? 'badge-warning' :
-                  order.status eq 'CANCELLED' ? 'badge-danger' : 'badge-secondary'}">
+          ${order.status eq 'COMPLETED' ? 'badge-success' :
+          order.status eq 'PENDING' ? 'badge-warning' :
+          order.status eq 'CANCELLED' ? 'badge-danger' : 'badge-secondary'}">
                     ${order.status}
                 </span>
               </div>
             </div>
           </a>
         </c:forEach>
+
       </div>
     </c:otherwise>
   </c:choose>

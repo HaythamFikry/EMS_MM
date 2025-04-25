@@ -26,6 +26,8 @@
                 ${error}
         </div>
     </c:if>
+
+
     <div class="card mx-auto" style="max-width: 600px;">
         <div class="card-header bg-primary text-white">
             <h4 class="mb-0">Submit Feedback</h4>

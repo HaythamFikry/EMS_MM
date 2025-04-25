@@ -65,8 +65,8 @@
                                 <label class="form-check-label" for="creditCard">Credit Card</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="PAYMENT_ATTENDANCE">
-                                <label class="form-check-label" for="paypal">Payment upon attendance</label>
+                                <input class="form-check-input" type="radio" name="paymentMethod" id="paymentAttendance" value="PAYMENT_ATTENDANCE">
+                                <label class="form-check-label" for="paymentAttendance">Payment upon attendance</label>
                             </div>
                         </div>
 
@@ -91,7 +91,8 @@
                             </div>
                             <div class="mb-3">
                                 <label for="cardholderName" class="form-label">Cardholder Name</label>
-                                <input type="text" class="form-control" id="cardholderName" required>
+                                <input type="text" class="form-control" id="cardholderName" name="cardholderName" required>
+
                             </div>
                         </div>
 
@@ -103,7 +104,7 @@
     </div>
 
     <div class="text-center mt-3">
-        <a href="${pageContext.request.contextPath}/events" class="btn btn-secondary">Continue Shopping</a>
+        <a href="${pageContext.request.contextPath}/events" class="btn btn-secondary">Back To Events</a>
     </div>
 </div>
 
@@ -120,7 +121,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const creditCardRadio = document.getElementById('creditCard');
-        const paypalRadio = document.getElementById('paypal');
+        const paymentAttendanceRadio = document.getElementById('paymentAttendance');  // Updated variable name
         const creditCardFields = document.getElementById('creditCardFields');
         const cardNumber = document.getElementById('cardNumber');
         const expiryDate = document.getElementById('expiryDate');
@@ -135,13 +136,23 @@
                 cardNumber.setAttribute('required', 'required');
                 expiryDate.setAttribute('required', 'required');
                 cvv.setAttribute('required', 'required');
+                document.getElementById('cardholderName').setAttribute('required', 'required');
             } else {
                 creditCardFields.style.display = 'none';
                 cardNumber.removeAttribute('required');
                 expiryDate.removeAttribute('required');
                 cvv.removeAttribute('required');
+                document.getElementById('cardholderName').removeAttribute('required');
             }
         }
+
+
+        // Call togglePaymentFields on page load to set initial state
+        togglePaymentFields();
+
+        // Add event listeners for payment method changes
+        creditCardRadio.addEventListener('change', togglePaymentFields);
+        paymentAttendanceRadio.addEventListener('change', togglePaymentFields);
 
         // Credit Card Validation
         cardNumber.addEventListener('input', function(e) {
@@ -281,16 +292,16 @@
                 }
             }
 
-            // Set flag in sessionStorage to track form submission
-            sessionStorage.setItem('checkoutSubmitted', 'true');
-
             // Show loading overlay
             loadingOverlay.style.display = 'block';
 
-            // For demo purposes, simulate a delay before form submission
+            // Set flag in sessionStorage to track form submission
+            sessionStorage.setItem('checkoutSubmitted', 'true');
+
+            // Submit the form after short delay
             setTimeout(() => {
                 form.submit();
-            }, 2000);
+            }, 5000);
         });
 
     });

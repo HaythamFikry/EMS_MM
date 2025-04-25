@@ -46,6 +46,10 @@
                     <div class="text-center">
                         <a href="${pageContext.request.contextPath}/register">Don't have an account? Register</a>
                     </div>
+
+                    <div class="text-center mt-2">
+                        <a href="${pageContext.request.contextPath}/forgotPassword">Forgot Password?</a>
+                    </div>
                 </form>
             </div>
         </div>

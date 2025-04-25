@@ -15,6 +15,12 @@
 
 <div class="container py-5">
     <div class="row">
+        <c:if test="${not empty error}">
+            <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                    ${error}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </c:if>
         <!-- Profile Sidebar -->
         <div class="col-md-3 text-center">
             <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mx-auto"
@@ -154,7 +160,7 @@
     <!-- Change Password Modal -->
     <div class="modal fade" id="changePasswordModal" tabindex="-1">
         <div class="modal-dialog">
-            <form method="post" action="${pageContext.request.contextPath}/profile/change-password" class="modal-content">
+            <form method="post" action="${pageContext.request.contextPath}/changePassword" class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Change Password</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

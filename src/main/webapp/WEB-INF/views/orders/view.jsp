@@ -13,15 +13,19 @@
   <c:if test="${order != null}">
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <h2>Order #${order.orderId}</h2>
+        <div>
+          <h2 class="mb-0">Order Details</h2>
+          <small class="text-muted">Order ID: ${order.orderId}</small>
+        </div>
         <span class="badge
-          ${order.status eq 'PAID' ? 'bg-success' :
-          order.status eq 'PENDING' ? 'bg-warning' :
-          order.status eq 'CANCELLED' ? 'bg-danger' :
-          order.status eq 'REFUNDED' ? 'bg-info' : 'bg-secondary'}">
+    ${order.status eq 'PAID' ? 'bg-success' :
+    order.status eq 'PENDING' ? 'bg-warning' :
+    order.status eq 'CANCELLED' ? 'bg-danger' :
+    order.status eq 'REFUNDED' ? 'bg-info' : 'bg-secondary'}">
             ${order.status}
         </span>
       </div>
+
       <div class="card-body">
         <div class="row mb-4">
           <div class="col-md-6">

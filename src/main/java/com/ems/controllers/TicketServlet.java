@@ -12,8 +12,7 @@ import javax.servlet.http.*;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @WebServlet(name = "TicketServlet", urlPatterns = { "/tickets", "/tickets/*", "/event-tickets" })
 public class TicketServlet extends HttpServlet {
@@ -215,6 +214,37 @@ public class TicketServlet extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/views/tickets/create.jsp").forward(request, response);
     }
 
+    private static int getLastNumber(String input) {
+        String digits = input.replaceAll("[^0-9]", "");
+        return digits.isEmpty() ? 0 : Integer.parseInt(digits);
+    }
+
+
+    private String generateTicketTypeWithNumber(List<Ticket>eventTickets, String ticketType,int eventId) {
+
+        Map<String, Set<Integer>> map = new HashMap<>();
+        for (Ticket ticket : eventTickets) {
+            String type = ticket.getTicketType();
+            int number = getLastNumber(type);
+            String name = type.replaceAll("[0-9]", "").trim();
+            name=name+ticket.getEvent().getEventId();
+            map.computeIfAbsent(name, k -> new HashSet<>()).add(number);
+        }
+
+        Set<Integer> numbers = map.get((ticketType+eventId));
+        if (numbers == null) {
+            return ticketType + " 1";
+        }
+        int missingNumber = 1;
+        while (numbers.contains(missingNumber)) {
+            missingNumber++;
+        }
+        return ticketType + " " + missingNumber;
+    }
+
+
+
+
     // Modified: Use a formatter to parse sale dates and redirect back to event view
     // (which shows tickets)
     private void createTicket(HttpServletRequest request, HttpServletResponse response)
@@ -238,9 +268,40 @@ public class TicketServlet extends HttpServlet {
                 return;
             }
 
-            String ticketType = request.getParameter("ticketType");
-            double price = Double.parseDouble(request.getParameter("price"));
-            int quantityAvailable = Integer.parseInt(request.getParameter("quantityAvailable"));
+            String ticketType = generateTicketTypeWithNumber(ticketService.getTicketsByEvent(eventId),request.getParameter("ticketType"),eventId);
+
+
+            String priceStr = request.getParameter("price");
+            double price;
+            try {
+                price = Double.parseDouble(priceStr);
+                if (price < 0 || price > 9999.99) {
+                    session.setAttribute("error", "Price must be between 0 and 9999.99.");
+                    response.sendRedirect(request.getContextPath() + "/events/" + eventId);
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                session.setAttribute("error", "Invalid price format.");
+                response.sendRedirect(request.getContextPath() + "/events/" + eventId);
+                return;
+            }
+
+// Validate quantityAvailable
+            String quantityStr = request.getParameter("quantityAvailable");
+            int quantityAvailable;
+            try {
+                quantityAvailable = Integer.parseInt(quantityStr);
+                if (quantityAvailable < 0) {
+                    session.setAttribute("error", "Quantity must be a positive number.");
+                    response.sendRedirect(request.getContextPath() + "/events/" + eventId);
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                session.setAttribute("error", "Invalid quantity format.");
+                response.sendRedirect(request.getContextPath() + "/events/" + eventId);
+                return;
+            }
+
             String description = request.getParameter("description");
 
             // Parse sale dates using a formatter matching the datetime-local input format
@@ -303,7 +364,12 @@ public class TicketServlet extends HttpServlet {
             }
 
             // Get the event associated with this ticket
-            Event event = ticket.getEvent();
+            Event event = eventService.getEventById(ticket.getEvent().getEventId());
+            if (event == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Event not found");
+                return;
+            }
+
 
             // Check if current user is the organizer of this event
             HttpSession session = request.getSession();
@@ -324,9 +390,50 @@ public class TicketServlet extends HttpServlet {
             }
 
             // For POST requests, update the ticket
-            String ticketType = request.getParameter("ticketType");
-            double price = Double.parseDouble(request.getParameter("price"));
-            int quantityAvailable = Integer.parseInt(request.getParameter("quantityAvailable"));
+//            String ticketType = request.getParameter("ticketType");
+            String ticketType ;
+            if(!request.getParameter("ticketType").equals(ticket.getTicketType().replaceAll("[0-9]", "").trim()))
+            {
+                 ticketType = generateTicketTypeWithNumber(ticketService.getTicketsByEvent(ticket.getEvent().getEventId()),request.getParameter("ticketType"),ticket.getEvent().getEventId());
+            }
+            else
+            {
+                ticketType = ticket.getTicketType();
+            }
+
+
+
+            String priceStr = request.getParameter("price");
+            double price;
+            try {
+                price = Double.parseDouble(priceStr);
+                if (price < 0 || price > 9999.99) {
+                    session.setAttribute("error", "Price must be between 0 and 9999.99.");
+                    response.sendRedirect(request.getContextPath() + "/events/" + ticket.getEvent().getEventId());
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                session.setAttribute("error", "Invalid price format.");
+                response.sendRedirect(request.getContextPath() + "/events/" + ticket.getEvent().getEventId());
+                return;
+            }
+
+// Validate quantityAvailable
+            String quantityStr = request.getParameter("quantityAvailable");
+            int quantityAvailable;
+            try {
+                quantityAvailable = Integer.parseInt(quantityStr);
+                if (quantityAvailable < 0) {
+                    session.setAttribute("error", "Quantity must be a positive number.");
+                    response.sendRedirect(request.getContextPath() + "/events/" + ticket.getEvent().getEventId());
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                session.setAttribute("error", "Invalid quantity format.");
+                response.sendRedirect(request.getContextPath() + "/events/" + ticket.getEvent().getEventId());
+                return;
+            }
+
             String description = request.getParameter("description");
 
             // Parse sale dates if provided

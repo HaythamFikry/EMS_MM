@@ -3,12 +3,16 @@ package com.ems.services;
 import com.ems.config.DatabaseConnection;
 import com.ems.dao.UserDAO;
 import com.ems.exceptions.EventManagementException;
+import com.ems.models.ResetToken;
 import com.ems.models.User;
 import com.ems.utils.PasswordHasher;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Service class for user management operations.
@@ -17,15 +21,23 @@ import java.util.List;
 public class UserService {
     private UserDAO userDAO;
     private Connection connection;
+    private Map<String, ResetToken> resetTokens = new HashMap<>();
+
+
+
+
 
     public UserService() {
         this.connection = DatabaseConnection.getInstance().getConnection();
         this.userDAO = new UserDAO(connection);
+
     }
 
     public UserService(UserDAO userDAO) {
         this.userDAO =userDAO;
     }
+
+
 
     // Register a new user
     public User registerUser(String username, String password, String email,
@@ -95,6 +107,53 @@ public class UserService {
         }
     }
 
+    public void resetPasswordWithToken(String token, String newPassword) throws SQLException {
+        ResetToken resetToken = resetTokens.get(token);
+
+       try {
+           if (resetToken == null || resetToken.isExpired()) {
+               throw new EventManagementException("Reset token is invalid or expired.");
+           }
+
+           if (resetToken.isBlocked()) {
+               throw new EventManagementException("Too many failed attempts. This token is now blocked.");
+           }
+
+           int userId = resetToken.getUserId();
+           User user = getUserById(userId);
+           if (user == null) {
+               throw new EventManagementException("User not found.");
+           }
+
+           String newPasswordHash = PasswordHasher.hashPassword(newPassword);
+           userDAO.updatePassword(userId, newPasswordHash);
+           resetTokens.remove(token);
+       }
+         catch (SQLException e) {
+             resetToken.incrementAttempts();
+              throw new EventManagementException("Failed to reset password", e);
+         }
+    }
+
+    public String generateResetToken(String email) throws SQLException {
+        User user = userDAO.getUserByEmail(email);
+        if (user == null) {
+            throw new EventManagementException("User with this email not found.");
+        }
+
+        String token;
+        do {
+            token = UUID.randomUUID().toString();
+        } while (resetTokens.containsKey(token));
+        // Set expiration time to 15 minutes from now
+        long expiration = System.currentTimeMillis() + (15 * 60 * 1000); // 15 minutes
+
+        resetTokens.put(token, new ResetToken(token, user.getUserId(), expiration));
+
+        return token;
+    }
+
+
     // Get user by ID
     public User getUserById(int userId) {
         try {
@@ -117,6 +176,14 @@ public class UserService {
             return userDAO.updateUser(user);
         } catch (SQLException e) {
             throw new EventManagementException("Failed to update user", e);
+        }
+    }
+
+    public User getUserByEmail(String email) {
+        try {
+            return userDAO.getUserByEmail(email);
+        } catch (SQLException e) {
+            throw new EventManagementException("Failed to retrieve user by email", e);
         }
     }
 

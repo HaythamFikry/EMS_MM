@@ -1,25 +1,18 @@
 package com.ems.controllers;
 
 import com.ems.exceptions.EventManagementException;
-import com.ems.models.Event;
-import com.ems.models.Feedback;
-import com.ems.models.Order;
-import com.ems.models.User;
-import com.ems.services.EventService;
-import com.ems.services.FeedbackService;
-import com.ems.services.OrderService;
-import com.ems.services.UserService;
+import com.ems.models.*;
+import com.ems.services.*;
 
 import javax.servlet.*;
 import javax.servlet.annotation.*;
 import javax.servlet.http.*;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
-@WebServlet(name = "UserServlet", urlPatterns = {"/register", "/login", "/logout", "/profile","/profile/change-password","/editProfile"})
+@WebServlet(name = "UserServlet", urlPatterns = {"/register", "/login", "/logout", "/profile","/changePassword","/editProfile","/forgotPassword","/resetPassword"})
 public class UserServlet extends HttpServlet {
     private UserService userService;
     private EventService eventService;
@@ -53,6 +46,12 @@ public class UserServlet extends HttpServlet {
             case "/profile":
                 showUserProfile(request, response);
                 break;
+            case "/forgotPassword":
+                showForgotPasswordForm(request, response);
+                break;
+            case "/resetPassword":
+                showResetPasswordForm(request, response);
+                break;
             default:
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
@@ -70,11 +69,17 @@ public class UserServlet extends HttpServlet {
             case "/login":
                 loginUser(request, response);
                 break;
-            case "/profile/change-password":
+            case "/changePassword":
                 changePassword(request, response);
                 break;
             case "/editProfile":
                 updateUser(request, response);
+                break;
+            case "/forgotPassword":
+                forgotPassword(request, response);
+                break;
+            case "/resetPassword":
+                resetPassword(request, response);
                 break;
             default:
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -91,6 +96,24 @@ public class UserServlet extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/views/users/login.jsp").forward(request, response);
     }
 
+
+
+    private void showForgotPasswordForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.getRequestDispatcher("/WEB-INF/views/users/forgotPassword.jsp").forward(request, response);
+    }
+
+    private void showResetPasswordForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String token = request.getParameter("token");
+        if (token == null || token.trim().isEmpty()) {
+            request.setAttribute("error", "Invalid or expired token.");
+            request.getRequestDispatcher("/WEB-INF/views/users/forgotPassword.jsp").forward(request, response);
+            return;
+        }
+        request.setAttribute("token", token);
+        request.getRequestDispatcher("/WEB-INF/views/users/resetPassword.jsp").forward(request, response);
+    }
     private void showUserProfile(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
@@ -130,6 +153,68 @@ public class UserServlet extends HttpServlet {
         request.setAttribute("createdAtDate", createdAtDate);
 
         request.getRequestDispatcher("/WEB-INF/views/users/profile.jsp").forward(request, response);
+    }
+    private void resetPassword(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String token = request.getParameter("token");
+        String newPassword = request.getParameter("newPassword");
+        String confirmPassword = request.getParameter("confirmPassword");
+
+        // Check if token is missing
+        if (token == null || token.trim().isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/forgotPassword");
+            return;
+        }
+
+        // Validate passwords match
+        if (!newPassword.equals(confirmPassword)) {
+            request.setAttribute("error", "Passwords do not match");
+            request.setAttribute("token", token);
+            request.getRequestDispatcher("/WEB-INF/views/users/resetPassword.jsp").forward(request, response);
+            return;
+        }
+
+        try {
+            // Reset password using token
+            userService.resetPasswordWithToken(token, newPassword);
+            response.sendRedirect(request.getContextPath() + "/login?message=Password has been reset successfully. Please login with your new password.");
+        } catch (EventManagementException | SQLException e) {
+            request.setAttribute("error", e.getMessage());
+            request.setAttribute("token", token);
+            request.getRequestDispatcher("/WEB-INF/views/users/resetPassword.jsp").forward(request, response);
+        }
+    }
+    private void forgotPassword(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String email = request.getParameter("email");
+
+        try {
+            // Generate and store password reset token
+            String token = userService.generateResetToken(email);
+
+            // Create reset URL
+            String resetUrl = request.getScheme() + "://" + request.getServerName() + ":" +
+                    request.getServerPort() + request.getContextPath() +
+                    "/resetPassword?token=" + token;
+
+            // Email subject and body
+            String subject = "Password Reset Request";
+            String body = "Hello,\n\n" +
+                    "You have requested to reset your password. Please click the link below to reset it:\n\n" +
+                    resetUrl + "\n\n" +
+                    "This link will expire in 15 minutes.\n\n" +
+                    "If you did not request this, please ignore this email.\n\n" +
+                    "Regards,\nEvent Management System";
+
+            // Send email with reset link
+            new EmailService().sendEmail(email, subject, body);
+
+            request.setAttribute("message", "A password reset link has been sent to your email address.");
+        } catch (EventManagementException | SQLException e) {
+            request.setAttribute("error", "Failed to process your request: " + e.getMessage());
+        }
+
+        request.getRequestDispatcher("/WEB-INF/views/users/forgotPassword.jsp").forward(request, response);
     }
 
     private void registerUser(HttpServletRequest request, HttpServletResponse response)
@@ -252,7 +337,23 @@ public class UserServlet extends HttpServlet {
             System.out.println("Try update");
             user.setFirstName(firstName);
             user.setLastName(lastName);
-            user.setEmail(email);
+
+
+            if(!user.getEmail().equals(email))
+            {
+                if(userService.getUserByEmail(email) != null)
+                {
+
+                    request.setAttribute("error", "Email already exists.");
+                    showUserProfile(request, response);
+                    return;
+                }
+                else
+                {
+                    user.setEmail(email);
+                }
+
+            }
 
             userService.updateUser(user);
             request.setAttribute("success", "Profile updated successfully.");

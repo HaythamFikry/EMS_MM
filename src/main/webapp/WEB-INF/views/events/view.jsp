@@ -245,15 +245,15 @@
                     </div>
                     <div class="mb-3">
                         <label for="priceModal" class="form-label">Price</label>
-                        <input type="number" step="0.01" class="form-control" id="priceModal" name="price" placeholder="e.g. 100.00" required>
+                        <input type="number" step="0.01" class="form-control" id="priceModal" name="price" placeholder="e.g. 100.00"  min="0" max="9999.99" required>
                     </div>
                     <div class="mb-3">
                         <label for="quantityAvailableModal" class="form-label">Quantity Available</label>
-                        <input type="number" class="form-control" id="quantityAvailableModal" name="quantityAvailable" required>
+                        <input type="number" class="form-control" id="quantityAvailableModal" name="quantityAvailable"  min="0" max="9999.99" required>
                     </div>
                     <div class="mb-3">
                         <label for="descriptionModal" class="form-label">Description</label>
-                        <textarea class="form-control" id="descriptionModal" name="description" rows="3" placeholder="Ticket details"></textarea>
+                        <textarea class="form-control" id="descriptionModal" name="description" rows="3" placeholder="Ticket details" maxlength="15"></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="saleStartDateModal" class="form-label">Sale Start Date</label>
@@ -293,15 +293,15 @@
                     </div>
                     <div class="mb-3">
                         <label for="editPrice" class="form-label">Price</label>
-                        <input type="number" step="0.01" class="form-control" id="editPrice" name="price" required>
+                        <input type="number" step="0.01" class="form-control" id="editPrice" name="price"  min="0" max="9999.99" required>
                     </div>
                     <div class="mb-3">
                         <label for="editQuantityAvailable" class="form-label">Quantity Available</label>
-                        <input type="number" class="form-control" id="editQuantityAvailable" name="quantityAvailable" required>
+                        <input type="number" class="form-control" id="editQuantityAvailable" name="quantityAvailable"  min="0" max="9999.99" required>
                     </div>
                     <div class="mb-3">
                         <label for="editDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="editDescription" name="description" rows="3"></textarea>
+                        <textarea class="form-control" id="editDescription" name="description" rows="3" maxlength="15"></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="editSaleStartDate" class="form-label">Sale Start Date</label>
@@ -389,9 +389,11 @@
             const saleStart = $(this).data('sale-start');
             const saleEnd = $(this).data('sale-end');
 
+            const cleanedType = ticketType.replace(/[0-9]/g, '').trim();
+
             $('#editTicketForm').attr('action', '${pageContext.request.contextPath}/tickets/' + ticketId + '/update');
             $('#editTicketId').val(ticketId);
-            $('#editTicketType').val(ticketType); // This will select the appropriate option in the dropdown
+            $('#editTicketType').val(cleanedType); // This will select the appropriate option in the dropdown
             $('#editPrice').val(price);
             $('#editQuantityAvailable').val(quantity);
             $('#editDescription').val(description);

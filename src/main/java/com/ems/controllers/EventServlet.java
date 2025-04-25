@@ -91,6 +91,13 @@ public class EventServlet extends HttpServlet {
     private void listEvents(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            HttpSession session = request.getSession();
+            User user = (User) session.getAttribute("user");
+            if (user == null) {
+                response.sendRedirect(request.getContextPath() + "/login");
+                return;
+            }
+
             List<Event> upcomingEvents = eventService.getAllNotCancelledEvents();
             List<Event> canceledEvents = eventService.getCanceledEvents();
 
@@ -210,17 +217,31 @@ public class EventServlet extends HttpServlet {
             int ticketsSold=0;
             int totalCapacity=0;
             List<Ticket>tickets = ticketService.getTicketsByEvent(eventId);
-           for(Ticket ticket : tickets){
-               ticketsSold += orderService.getTotalQuantityByTicketId(ticket.getTicketId());
-                totalCapacity += ticket.getQuantityAvailable()+orderService.getTotalQuantityByTicketId(ticket.getTicketId());
+            if(tickets.isEmpty())
+            {
+                ticketsSold=orderService.getSoldQuantityByEventID(eventId);
+                totalCapacity=ticketsSold;
             }
+            else
+            {
+                for(Ticket ticket : tickets){
+                    ticketsSold += orderService.getTotalQuantityByTicketId(ticket.getTicketId());
+                    totalCapacity += ticket.getQuantityAvailable()+orderService.getTotalQuantityByTicketId(ticket.getTicketId());
+                }
+            }
+
 
            List<Ticket>isAvailableTickets=new ArrayList<>();
            for (Ticket ticket : tickets) {
                if (ticket.getQuantityAvailable() > 0) {
                    isAvailableTickets.add(ticket);
                }
+               else
+               {
+                   ticketService.deleteTicket(ticket.getTicketId());
+               }
            }
+
 
             request.setAttribute("event", event);
             request.setAttribute("startDate", startDate);
@@ -259,7 +280,7 @@ public class EventServlet extends HttpServlet {
 
 
         // Check venue availability before creating the event
-        if (!eventService.isVenueAvailable(venueId, startDateTime, endDateTime)) {
+        if (!eventService.isVenueAvailable(venueId,-1, startDateTime, endDateTime)) {
             request.setAttribute("error", "The selected venue is already booked during this time.");
             List<Venue> venues = VenueService.getAllVenues(); // for repopulating the form
             request.setAttribute("venues", venues);
@@ -330,6 +351,11 @@ public class EventServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
+            if (event.getStatus() == Event.EventStatus.CANCELLED) {
+                session.setAttribute("error", "Event cancelled.");
+                response.sendRedirect(request.getContextPath() + "/events/" + event.getEventId());
+                return;
+            }
 
             // Check if current user is the organizer
             if (event.getOrganizer().getUserId() != user.getUserId()) {
@@ -362,8 +388,32 @@ public class EventServlet extends HttpServlet {
                 return;
             }
 
+
+
+
+            // Check venue availability before updating the event
+            if(request.getParameter("venueId").equals(""))
+            {
+                request.setAttribute("error", "Please select a venue");
+                // Redirect back to the form page
+                request.getRequestDispatcher("/WEB-INF/views/events/new.jsp").forward(request, response);
+                return;
+            }
             Venue venue =VenueService.getVenueById(Integer.parseInt(request.getParameter("venueId"))) ;
             event.setVenue(venue);
+
+
+            int venueId = Integer.parseInt(request.getParameter("venueId"));
+            LocalDateTime startDateTime = LocalDateTime.parse(request.getParameter("startDateTime"));
+            LocalDateTime endDateTime = LocalDateTime.parse(request.getParameter("endDateTime"));
+
+            if (!eventService.isVenueAvailable(venueId,eventId,startDateTime, endDateTime)) {
+                request.setAttribute("error", "The selected venue is already booked during this time.");
+                List<Venue> venues = VenueService.getAllVenues(); // for repopulating the form
+                request.setAttribute("venues", venues);
+                request.getRequestDispatcher("/WEB-INF/views/events/new.jsp").forward(request, response);
+                return;
+            }
 
 
             // Handle image
@@ -387,6 +437,16 @@ public class EventServlet extends HttpServlet {
                 // Save new image
                 String imageUrl = FileUtils.saveEventImage(filePart, request.getServletContext().getRealPath(""));
                 event.setImageUrl(imageUrl);
+            }
+
+            if(request.getParameter("status").equals(""))
+            {
+                request.setAttribute("error", "Please select a status");
+                return;
+            }
+            else
+            {
+                event.setStatus(Event.EventStatus.valueOf(request.getParameter("status").toUpperCase()));
             }
 
             eventService.updateEvent(event);

@@ -124,18 +124,20 @@ public class VenueDAO {
         return venue;
     }
 
-    public boolean isVenueAvailable(int venueId, LocalDateTime start, LocalDateTime end) throws SQLException {
+    public boolean isVenueAvailable(int venueId,int eventId, LocalDateTime start, LocalDateTime end) throws SQLException {
         String sql = "SELECT COUNT(*) FROM events " +
                 "WHERE venue_id = ? " +
+                "AND event_id != ? " +
                 "AND ((start_datetime < ? AND end_datetime > ?) " + // overlap before
                 "OR (start_datetime >= ? AND start_datetime < ?))";   // starts during
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, venueId);
-            stmt.setTimestamp(2, Timestamp.valueOf(end));
-            stmt.setTimestamp(3, Timestamp.valueOf(start));
+            stmt.setInt(2, eventId);
+            stmt.setTimestamp(3, Timestamp.valueOf(end));
             stmt.setTimestamp(4, Timestamp.valueOf(start));
-            stmt.setTimestamp(5, Timestamp.valueOf(end));
+            stmt.setTimestamp(5, Timestamp.valueOf(start));
+            stmt.setTimestamp(6, Timestamp.valueOf(end));
 
             try (ResultSet rs = stmt.executeQuery()) {
                 rs.next();

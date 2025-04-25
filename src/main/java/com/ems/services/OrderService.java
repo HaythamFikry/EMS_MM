@@ -2,6 +2,7 @@ package com.ems.services;
 
 import com.ems.config.DatabaseConnection;
 import com.ems.dao.OrderDAO;
+import com.ems.dao.SoldTicketDAO;
 import com.ems.dao.TicketDAO;
 import com.ems.exceptions.EventManagementException;
 import com.ems.models.Order;
@@ -19,6 +20,7 @@ public class OrderService {
     private OrderDAO orderDAO;
     private TicketDAO ticketDAO;
     private Connection connection;
+    private SoldTicketDAO soldTicketDAO ;
 
     private static OrderService instance;
 
@@ -33,6 +35,7 @@ public class OrderService {
         this.connection = DatabaseConnection.getInstance().getConnection();
         this.orderDAO = new OrderDAO(connection);
         this.ticketDAO = new TicketDAO(connection);
+        this.soldTicketDAO = new SoldTicketDAO(connection);
     }
     public Order getPendingOrderByUser(int userId) {
         try {
@@ -89,7 +92,7 @@ public class OrderService {
                 Order order = new Order(
                         0,
                         attendee,
-                        LocalDateTime.now(),
+                        LocalDateTime.now().withNano(0),
                         Order.OrderStatus.PENDING.toString(),
                         totalAmount,
                         paymentMethod,
@@ -149,6 +152,14 @@ public class OrderService {
         }
     }
 
+    public int getSoldQuantityByEventID(int ticketId) {
+        try {
+            return soldTicketDAO.getSoldQuantityByEventID(ticketId);
+        } catch (SQLException e) {
+            throw new EventManagementException("Failed to retrieve sold quantity for ticket", e);
+        }
+    }
+
     public int getTotalQuantityByTicketId(int ticketId) {
         try {
             return orderDAO.getTotalQuantityByTicketId(ticketId);
@@ -168,7 +179,28 @@ public class OrderService {
     // Complete an order (after payment)
     public void completeOrder(int orderId) {
         try {
+
+            // Get the order with items
+            Order order = orderDAO.getOrderById(orderId);
+
+            if (order == null) {
+                throw new EventManagementException("Order not found");
+            }
+
             orderDAO.updateOrderStatus(orderId, Order.OrderStatus.PAID.toString());
+
+            // Insert sold tickets for each order item
+            for (OrderItem item : order.getOrderItems()) {
+                soldTicketDAO.insertSoldTicket(
+                        item.getTicket().getTicketId(),
+                        item.getTicket().getEvent().getEventId(),
+                        item.getOrderItemId(),
+                        order.getOrderId(),
+                        item.getQuantity(),
+                        item.getPricePerUnit()
+                );
+            }
+
         } catch (SQLException e) {
             throw new EventManagementException("Failed to complete order", e);
         }

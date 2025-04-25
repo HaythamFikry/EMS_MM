@@ -12,7 +12,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @WebServlet(name = "FeedbackServlet", urlPatterns = {"/feedback/*", "/feedback/my"})
@@ -68,7 +70,9 @@ public class FeedbackServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         User user = (User) request.getSession().getAttribute("user");
+        HttpSession session = request.getSession();
 
         if (user == null) {
             response.sendRedirect(request.getContextPath() + "/login");
@@ -98,6 +102,13 @@ public class FeedbackServlet extends HttpServlet {
             feedback.setEvent(event);
             feedback.setRating(rating);
             feedback.setComments(comments);
+
+            Event event1 = eventService.getEventById(eventId);
+            if (event1 == null || !LocalDateTime.now().isAfter(event1.getEndDateTime())) {
+                session.setAttribute("error", "You can only submit feedback for events that have ended.");
+                response.sendRedirect(request.getContextPath() + "/feedback/my");
+                return;
+            }
 
 
 

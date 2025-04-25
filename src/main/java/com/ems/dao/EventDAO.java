@@ -52,32 +52,33 @@ public class EventDAO {
         }
     }
 
-
-    public boolean isVenueAvailable(int venueId, LocalDateTime start, LocalDateTime end) throws SQLException {
-        // Extract just the date parts
+    public boolean isVenueAvailable(int venueId,int eventId, LocalDateTime start, LocalDateTime end) throws SQLException {
         LocalDate startDate = start.toLocalDate();
         LocalDate endDate = end.toLocalDate();
 
         String sql = "SELECT COUNT(*) FROM events " +
                 "WHERE venue_id = ? " +
-                "AND ((DATE(start_datetime) <= ? AND DATE(end_datetime) >= ?) " + // date range overlaps
-                "OR (DATE(start_datetime) >= ? AND DATE(start_datetime) <= ?))";   // start date is within range
+                "AND event_id != ? " +
+                "AND status != 'DRAFT' " +
+                "AND status != 'CANCELLED'" +
+                "AND ((DATE(start_datetime) <= ? AND DATE(end_datetime) >= ?) " +
+                "OR (DATE(start_datetime) >= ? AND DATE(start_datetime) <= ?))";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, venueId);
-            stmt.setDate(2, java.sql.Date.valueOf(endDate));
-            stmt.setDate(3, java.sql.Date.valueOf(startDate));
+            stmt.setInt(2, eventId);
+            stmt.setDate(3, java.sql.Date.valueOf(endDate));
             stmt.setDate(4, java.sql.Date.valueOf(startDate));
-            stmt.setDate(5, java.sql.Date.valueOf(endDate));
+            stmt.setDate(5, java.sql.Date.valueOf(startDate));
+            stmt.setDate(6, java.sql.Date.valueOf(endDate));
 
             try (ResultSet rs = stmt.executeQuery()) {
                 rs.next();
-                return rs.getInt(1) == 0; // true if 0 conflicts
+                return rs.getInt(1) == 0;
             }
         }
     }
 
-    // Update an existing event in the database
     public Event updateEvent(Event event) throws SQLException {
         String sql = "UPDATE events SET title = ?, description = ?, start_datetime = ?, " +
                 "end_datetime = ?, venue_id = ?, image_url = ?, status = ?, " +
@@ -102,7 +103,6 @@ public class EventDAO {
         }
     }
 
-    // Get an event by ID
     public Event getEventById(int eventId) throws SQLException {
         String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, u.password_hash, " +
                 "v.venue_id, v.name as venue_name, v.address, v.capacity " +
@@ -123,86 +123,34 @@ public class EventDAO {
         }
     }
 
-    // Get all events
     public List<Event> getAllEvents() throws SQLException {
-//        String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, " +
-//                "v.venue_id, v.name as venue_name, v.address, v.capacity " +
-//                "FROM events e " +
-//                "JOIN users u ON e.organizer_id = u.user_id " +
-//                "LEFT JOIN venues v ON e.venue_id = v.venue_id " +
-//                "ORDER BY e.start_datetime";
-//
-//        List<Event> events = new ArrayList<>();
-//
-//        try (Statement stmt = connection.createStatement();
-//             ResultSet rs = stmt.executeQuery(sql)) {
-//            while (rs.next()) {
-//                events.add(mapRowToEvent(rs));
-//            }
-//        }
-//
-//        return events;
-
-
-
-
-        String sql = "SELECT * FROM events ORDER BY start_datetime";
+        String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, u.password_hash, " +
+                "v.venue_id, v.name as venue_name, v.address, v.capacity " +
+                "FROM events e " +
+                "JOIN users u ON e.organizer_id = u.user_id " +
+                "LEFT JOIN venues v ON e.venue_id = v.venue_id " +
+                "ORDER BY e.start_datetime";
 
         List<Event> events = new ArrayList<>();
 
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                Event event = new Event(
-                        rs.getInt("event_id"),
-                        rs.getString("title"),
-                        rs.getString("description"),
-                        rs.getTimestamp("start_datetime").toLocalDateTime(),
-                        rs.getTimestamp("end_datetime").toLocalDateTime(),
-                        null, // venue مش موجود
-                        null, // organizer مش موجود
-                        rs.getString("image_url")
-                );
-
-                event.setStatus(Event.EventStatus.valueOf(rs.getString("status")));
-                event.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                event.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-
-                events.add(event);
+                events.add(mapRowToEvent(rs));
             }
         }
 
         return events;
     }
 
-    // Get events organized by a specific user
     public List<Event> getEventsByOrganizer(int organizerId) throws SQLException {
-//        String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, " +
-//                "v.venue_id, v.name as venue_name, v.address, v.capacity " +
-//                "FROM events e " +
-//                "JOIN users u ON e.organizer_id = u.user_id " +
-//                "LEFT JOIN venues v ON e.venue_id = v.venue_id " +
-//                "WHERE e.organizer_id = ? " +
-//                "ORDER BY e.start_datetime";
-//
-//        List<Event> events = new ArrayList<>();
-//
-//        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-//            stmt.setInt(1, organizerId);
-//
-//            try (ResultSet rs = stmt.executeQuery()) {
-//                while (rs.next()) {
-//                    events.add(mapRowToEvent(rs));
-//                }
-//            }
-//        }
-//
-//        return events;
-
-
-
-        String sql = "SELECT * FROM events WHERE organizer_id = ? ORDER BY start_datetime";
+        String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, u.password_hash, " +
+                "v.venue_id, v.name as venue_name, v.address, v.capacity " +
+                "FROM events e " +
+                "JOIN users u ON e.organizer_id = u.user_id " +
+                "LEFT JOIN venues v ON e.venue_id = v.venue_id " +
+                "WHERE e.organizer_id = ? " +
+                "ORDER BY e.start_datetime";
 
         List<Event> events = new ArrayList<>();
 
@@ -211,23 +159,7 @@ public class EventDAO {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-
-                    Event event = new Event(
-                            rs.getInt("event_id"),
-                            rs.getString("title"),
-                            rs.getString("description"),
-                            rs.getTimestamp("start_datetime").toLocalDateTime(),
-                            rs.getTimestamp("end_datetime").toLocalDateTime(),
-                            null,
-                            null,
-                            rs.getString("image_url")
-                    );
-
-                    event.setStatus(Event.EventStatus.valueOf(rs.getString("status")));
-                    event.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                    event.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-
-                    events.add(event);
+                    events.add(mapRowToEvent(rs));
                 }
             }
         }
@@ -235,7 +167,6 @@ public class EventDAO {
         return events;
     }
 
-    // Add an event observer (for notifications)
     public void addEventObserver(int eventId, int userId) throws SQLException {
         String sql = "INSERT INTO event_observers (event_id, user_id) VALUES (?, ?)";
 
@@ -246,7 +177,6 @@ public class EventDAO {
         }
     }
 
-    // Remove an event observer
     public void removeEventObserver(int eventId, int userId) throws SQLException {
         String sql = "DELETE FROM event_observers WHERE event_id = ? AND user_id = ?";
 
@@ -257,7 +187,6 @@ public class EventDAO {
         }
     }
 
-    // Get all observers for an event
     public List<User> getEventObservers(int eventId) throws SQLException {
         String sql = "SELECT u.* FROM event_observers eo " +
                 "JOIN users u ON eo.user_id = u.user_id " +
@@ -278,7 +207,6 @@ public class EventDAO {
         return observers;
     }
 
-    // Helper method to map a ResultSet row to an Event object
     private Event mapRowToEvent(ResultSet rs) throws SQLException {
         User organizer = mapRowToUser(rs);
 
@@ -310,7 +238,6 @@ public class EventDAO {
         return event;
     }
 
-    // Helper method to map a ResultSet row to a User object
     private User mapRowToUser(ResultSet rs) throws SQLException {
         return new User(
                 rs.getInt("user_id"),
@@ -324,66 +251,46 @@ public class EventDAO {
     }
 
     public List<Event> getAllNotCancelledEvents() throws SQLException {
-        String sql = "SELECT * FROM events WHERE status != 'CANCELLED' ORDER BY start_datetime";
+        String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, u.password_hash, " +
+                "v.venue_id, v.name as venue_name, v.address, v.capacity " +
+                "FROM events e " +
+                "JOIN users u ON e.organizer_id = u.user_id " +
+                "LEFT JOIN venues v ON e.venue_id = v.venue_id " +
+                "WHERE e.status != 'CANCELLED' AND e.status != 'DRAFT' " +
+                "ORDER BY e.start_datetime";
 
         List<Event> events = new ArrayList<>();
 
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Event event = new Event(
-                        rs.getInt("event_id"),
-                        rs.getString("title"),
-                        rs.getString("description"),
-                        rs.getTimestamp("start_datetime").toLocalDateTime(),
-                        rs.getTimestamp("end_datetime").toLocalDateTime(),
-                        null,
-                        null,
-                        rs.getString("image_url")
-                );
-
-                event.setStatus(Event.EventStatus.valueOf(rs.getString("status")));
-                event.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                event.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-
-                events.add(event);
+                events.add(mapRowToEvent(rs));
             }
         }
 
         return events;
     }
-
 
     public List<Event> getCanceledEvents() throws SQLException {
-        String sql = "SELECT * FROM events WHERE status = 'CANCELLED' ORDER BY start_datetime";
+        String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, u.password_hash, " +
+                "v.venue_id, v.name as venue_name, v.address, v.capacity " +
+                "FROM events e " +
+                "JOIN users u ON e.organizer_id = u.user_id " +
+                "LEFT JOIN venues v ON e.venue_id = v.venue_id " +
+                "WHERE e.status = 'CANCELLED' " +
+                "ORDER BY e.start_datetime";
 
         List<Event> events = new ArrayList<>();
 
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Event event = new Event(
-                        rs.getInt("event_id"),
-                        rs.getString("title"),
-                        rs.getString("description"),
-                        rs.getTimestamp("start_datetime").toLocalDateTime(),
-                        rs.getTimestamp("end_datetime").toLocalDateTime(),
-                        null, // venue will be loaded separately if needed
-                        null, // organizer will be loaded separately if needed
-                        rs.getString("image_url")
-                );
-
-                event.setStatus(Event.EventStatus.valueOf(rs.getString("status")));
-                event.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                event.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
-
-                events.add(event);
+                events.add(mapRowToEvent(rs));
             }
         }
 
         return events;
     }
-
 }

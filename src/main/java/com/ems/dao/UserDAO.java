@@ -117,6 +117,8 @@ public class UserDAO {
         }
     }
 
+
+
     // Update user password
     public void updatePassword(int userId, String newPasswordHash) throws SQLException {
         String sql = "UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP " +

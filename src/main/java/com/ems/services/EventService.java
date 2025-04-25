@@ -157,9 +157,11 @@ public class EventService {
         }
     }
 
-    public boolean isVenueAvailable(int venueId, LocalDateTime start, LocalDateTime end) throws EventManagementException {
+
+
+    public boolean isVenueAvailable(int venueId,int eventId, LocalDateTime start, LocalDateTime end) throws EventManagementException {
         try {
-            return eventDAO.isVenueAvailable(venueId, start, end);
+            return eventDAO.isVenueAvailable(venueId,eventId, start, end);
         } catch (SQLException e) {
             throw new EventManagementException("Error checking venue availability", e);
         }

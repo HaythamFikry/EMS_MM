@@ -1,10 +1,10 @@
 package com.ems.controllers;
 
+import com.ems.config.DatabaseConnection;
+import com.ems.dao.EventDAO;
 import com.ems.exceptions.EventManagementException;
-import com.ems.models.Order;
-import com.ems.models.OrderItem;
-import com.ems.models.Ticket;
-import com.ems.models.User;
+import com.ems.models.*;
+import com.ems.services.EventService;
 import com.ems.services.OrderService;
 import com.ems.services.TicketService;
 
@@ -15,21 +15,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.Connection;
+import java.util.*;
 
 @WebServlet(name = "OrderServlet", urlPatterns = {"/orders", "/orders/*", "/checkout"})
 public class OrderServlet extends HttpServlet {
     private OrderService orderService;
     private TicketService ticketService;
+    private EventDAO eventDAO;
+    private Connection connection;
 
     @Override
     public void init() throws ServletException {
         super.init();
         this.orderService = OrderService.getInstance();
         this.ticketService = TicketService.getInstance();
+        this.connection = DatabaseConnection.getInstance().getConnection();
+        this.eventDAO = new  EventDAO(connection);
     }
 
     @Override
@@ -159,6 +161,13 @@ public class OrderServlet extends HttpServlet {
             orderItems.add(item);
 
             Order order = orderService.createOrder(user, orderItems, "CREDIT_CARD");
+            List<User>observers = eventDAO.getEventObservers(ticket.getEvent().getEventId());
+            boolean exists = observers.stream()
+                    .anyMatch(u -> u.getUserId() == user.getUserId());
+
+            if(!exists) {
+                eventDAO.addEventObserver(ticket.getEvent().getEventId(), user.getUserId());
+            }
 
             session.setAttribute("message", "Order completed successfully!");
             response.sendRedirect(request.getContextPath() + "/orders/" + order.getOrderId());
@@ -183,15 +192,16 @@ public class OrderServlet extends HttpServlet {
 
             List<Order> orders = orderService.getOrdersByUser(user.getUserId());
 
-            // Ensure orders is never null
             if (orders == null) {
                 orders = new ArrayList<>();
             }
 
+            // Sort orders by orderDate descending (latest first)
+            orders.sort(Comparator.comparing(Order::getOrderDate).reversed());
+
             request.setAttribute("orders", orders);
             request.getRequestDispatcher("/WEB-INF/views/orders/list.jsp").forward(request, response);
         } catch (Exception e) {
-            // Catch and log all exceptions, not just EventManagementException
             System.err.println("Error retrieving orders: " + e.getMessage());
             e.printStackTrace();
 
@@ -199,6 +209,7 @@ public class OrderServlet extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/views/errors/500.jsp").forward(request, response);
         }
     }
+
 
     private void viewOrderDetails(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

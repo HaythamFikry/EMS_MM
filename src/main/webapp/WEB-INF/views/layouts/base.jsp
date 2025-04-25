@@ -117,7 +117,7 @@
     <script src="${pageContext.request.contextPath}/js/scripts.js"></script>
     <script>
         const notificationBadge = document.getElementById('notification-badge');
-        const pollInterval = 300000000; // 30 seconds
+        const pollInterval = 3000; // 30 seconds
 
         function fetchNotificationCount() {
             fetch('${pageContext.request.contextPath}/notifications/poll')

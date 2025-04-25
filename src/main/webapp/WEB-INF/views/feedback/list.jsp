@@ -4,7 +4,12 @@
 <c:set var="pageTitle" value="My Feedback" scope="request" />
 
 <jsp:include page="/WEB-INF/views/layouts/base.jsp" />
-
+<% if (session.getAttribute("error") != null) { %>
+<div class="alert alert-danger">
+    <%= session.getAttribute("error") %>
+</div>
+<% session.removeAttribute("error"); %>
+<% } %>
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>My Feedback</h2>

@@ -30,6 +30,9 @@
     <url-pattern>/logout</url-pattern>
     <url-pattern>/profile</url-pattern>
     <url-pattern>/editProfile</url-pattern>
+    <url-pattern>/changePassword</url-pattern>
+    <url-pattern>/forgotPassword</url-pattern>
+    <url-pattern>/resetPassword</url-pattern>
   </servlet-mapping>
 
 
