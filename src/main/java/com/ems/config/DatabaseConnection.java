@@ -13,9 +13,9 @@ public class DatabaseConnection {
     private Connection connection;
 
     // Database configuration
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/event_management_system?useSSL=false&serverTimezone=UTC";
+    private static final String DB_URL = "jdbc:mysql://mysql:3306/event_management_system?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "7aKF^bH9LG&3QpXV";
+    private static final String DB_PASSWORD = "root";
 
 
     private DatabaseConnection() {
