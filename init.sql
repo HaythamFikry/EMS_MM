@@ -144,4 +144,13 @@ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 FOREIGN KEY (event_id) REFERENCES events(event_id) ON DELETE CASCADE,
 FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
 UNIQUE KEY unique_observer (event_id, user_id)
+);CREATE TABLE sold_tickets (
+    sold_ticket_id INT AUTO_INCREMENT PRIMARY KEY,
+    ticket_id INT NOT NULL,
+    event_id INT NOT NULL,
+    order_item_id INT NOT NULL, 
+    order_id INT NOT NULL, 
+    quantity INT NOT NULL,
+    sale_price DECIMAL(10, 2) NOT NULL, 
+    sold_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
