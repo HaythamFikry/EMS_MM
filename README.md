@@ -65,7 +65,8 @@ A Java Servlet-based web application for managing events, ticketing, and real-ti
 Make sure you have Docker installed and running
 then type the following command from the application root directory
 ```
-docker-compose up
+docker-compose down --volumes
+docker-compose up --build
 ```
 the application can be accessed from this URL [http://localhost:8080/EventManagementSystemV2/](http://localhost:8080/EventManagementSystemV2/)
 
