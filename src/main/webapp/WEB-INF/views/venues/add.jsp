@@ -26,7 +26,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Capacity</label>
-                    <input type="number" name="capacity" class="form-control" required>
+                    <input type="number" name="capacity" class="form-control" min="1" max="100000" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Contact Person</label>
@@ -34,7 +34,8 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Phone</label>
-                    <input type="text" name="contactPhone" class="form-control">
+                    <input type="text" name="contactPhone" class="form-control" pattern="^[+]?[0-9]{10,15}$" title="Enter a valid phone number (10-15 digits)"
+                    >
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Email</label>
@@ -42,6 +43,20 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Add Venue</button>
             </form>
+
+            <script>
+                document.getElementById('addVenueForm').addEventListener('submit', function(e) {
+                    const form = e.target;
+                    const capacityField = form.querySelector('input[name="capacity"]');
+                    const capacity = parseInt(capacityField.value, 10);
+
+                    if (isNaN(capacity) || capacity < 1 || capacity > 100000) {
+                        alert('Please enter a valid capacity between 1 and 100,000.');
+                        e.preventDefault(); // Prevent the form from being submitted
+                    }
+                });
+            </script>
+
         </div>
     </div>
 </div>

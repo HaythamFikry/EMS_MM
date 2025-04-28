@@ -78,15 +78,60 @@ public class VenueServlet extends HttpServlet {
             String venueIdStr = request.getParameter("venueId"); // match input name in form
             int venueId = (venueIdStr != null && !venueIdStr.isEmpty()) ? Integer.parseInt(venueIdStr) : 0;
 
-            Venue venue = new Venue(
+            String name = request.getParameter("name");
+            String address = request.getParameter("address");
+            String contactPerson = request.getParameter("contactPerson");
+            String contactPhone = request.getParameter("contactPhone");
+            String contactEmail = request.getParameter("contactEmail");
+            String capacityStr = request.getParameter("capacity");
+
+                // Validate all fields
+                if (name == null || name.isEmpty() || address == null || address.isEmpty()) {
+                    request.setAttribute("error", "Invalid input. Name and address must not be empty.");
+                    request.setAttribute("venues", venueService.getAllVenues());
+                    request.getRequestDispatcher("/WEB-INF/views/venues/list.jsp").forward(request, response);
+                    return;
+                }
+
+                int capacity = Integer.parseInt(capacityStr);
+                if (capacity < 1 || capacity > 100000) {
+                    request.setAttribute("error", "Invalid capacity. Must be between 1 and 100,000.");
+                    request.setAttribute("venues", venueService.getAllVenues());
+                    request.getRequestDispatcher("/WEB-INF/views/venues/list.jsp").forward(request, response);
+                    return;
+                }
+
+                if (contactPerson == null || contactPerson.isEmpty()) {
+                    request.setAttribute("error", "must be not empty.");
+                    request.setAttribute("venues", venueService.getAllVenues());
+                    request.getRequestDispatcher("/WEB-INF/views/venues/list.jsp").forward(request, response);
+                    return;
+                }
+
+                if (!contactPhone.matches("^[+]?[0-9]{10,15}$")) {
+                    request.setAttribute("error", "Invalid phone format.");
+                    request.setAttribute("venues", venueService.getAllVenues());
+                    request.getRequestDispatcher("/WEB-INF/views/venues/list.jsp").forward(request, response);
+                    return;
+                }
+
+                if (!contactEmail.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+                    request.setAttribute("error", "Invalid email format.");
+                    request.setAttribute("venues", venueService.getAllVenues());
+                    request.getRequestDispatcher("/WEB-INF/views/venues/list.jsp").forward(request, response);
+                    return;
+                }
+
+
+                Venue venue = new Venue(
                     venueId,
-                    request.getParameter("name"),
-                    request.getParameter("address"),
-                    Integer.parseInt(request.getParameter("capacity"))
+                    name,
+                    address,
+                    capacity
             );
-            venue.setContactPerson(request.getParameter("contactPerson"));
-            venue.setContactPhone(request.getParameter("contactPhone"));
-            venue.setContactEmail(request.getParameter("contactEmail"));
+            venue.setContactPerson(contactPerson);
+            venue.setContactPhone(contactPhone);
+            venue.setContactEmail(contactEmail);
 
             if ("/venues/edit".equals(path)) {
                 venueService.updateVenue(venue);

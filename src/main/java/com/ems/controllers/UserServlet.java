@@ -234,6 +234,11 @@ public class UserServlet extends HttpServlet {
                 request.getRequestDispatcher("/WEB-INF/views/users/register.jsp").forward(request, response);
                 return;
             }
+            if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+                request.setAttribute("error", "Invalid email format.");
+                request.getRequestDispatcher("/WEB-INF/views/users/register.jsp").forward(request, response);
+                return;
+            }
 
             User user = userService.registerUser(username, password, email, firstName, lastName, role);
 

@@ -6,7 +6,11 @@
     String username = (String) session.getAttribute("username");
     String role = (String) session.getAttribute("role");
 %>
-
+<c:if test="${not empty error}">
+    <div class="alert alert-danger" role="alert">
+            ${error}
+    </div>
+</c:if>
 <!DOCTYPE html>
 <html>
 <head>
