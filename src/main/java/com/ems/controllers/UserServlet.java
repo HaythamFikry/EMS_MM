@@ -33,6 +33,18 @@ public class UserServlet extends HttpServlet {
             throws ServletException, IOException {
         String path = request.getServletPath();
         System.out.println(path);
+
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        // List of paths that should not be accessible when logged in
+        List<String> restrictedPaths = Arrays.asList("/login", "/register","/forgotPassword","/resetPassword");
+
+        if (user != null && restrictedPaths.contains(path)) {
+            // User is already logged in, redirect to profile or home
+            response.sendRedirect(request.getContextPath() + "/profile");
+            return;
+        }
+
         switch (path) {
             case "/register":
                 showRegistrationForm(request, response);
