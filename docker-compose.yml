@@ -2,7 +2,7 @@ services:
   mysql:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: 7aKF^bH9LG&3QpXV
       MYSQL_DATABASE: event_management_system
     ports:
       - "3307:3306"
@@ -21,7 +21,7 @@ services:
       - DB_PORT=3306
       - DB_NAME=event_management_system
       - DB_USER=root
-      - DB_PASS=root
+      - DB_PASS=7aKF^bH9LG&3QpXV
 
 volumes:
   db_data:
