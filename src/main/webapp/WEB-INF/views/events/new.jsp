@@ -25,17 +25,17 @@
                             <form action="${pageContext.request.contextPath}/events" method="post" enctype="multipart/form-data">
                                 <div class="mb-3">
                                     <label for="title" class="form-label">Event Title</label>
-                                    <input type="text" class="form-control" id="title" name="title" required>
+                                    <input type="text" class="form-control" id="title" name="title" ui_test="add-event-title" required>
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="description" class="form-label">Description</label>
-                                    <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                                    <textarea class="form-control" id="description" name="description" rows="4" required ui_test="add-event-description"></textarea>
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="venueId" class="form-label">Choose Venue</label>
-                                    <select class="form-select" id="venueId" name="venueId" required>
+                                    <select class="form-select" id="venueId" name="venueId" ui_test="add-event-venue" required>
                                         <option value="">Select a venue...</option>
                                         <c:forEach items="${venues}" var="venue">
                                             <option value="${venue.venueId}">
@@ -48,28 +48,28 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="startDateTime" class="form-label">Start Date & Time</label>
-                                        <input type="datetime-local" class="form-control" id="startDateTime" name="startDateTime" required>
+                                        <input type="datetime-local" class="form-control" id="startDateTime" name="startDateTime" ui_test="add-event-start-date-time" required>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="endDateTime" class="form-label">End Date & Time</label>
-                                        <input type="datetime-local" class="form-control" id="endDateTime" name="endDateTime" required>
+                                        <input type="datetime-local" class="form-control" id="endDateTime" name="endDateTime"  ui_test="add-event-end-date-time" required>
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="eventImage" class="form-label">Event Image</label>
-                                    <input type="file" class="form-control" id="eventImage" name="eventImage" placeholder="Upload an image with max size 10MB">
+                                    <input type="file" class="form-control" id="eventImage" name="eventImage" ui_test="add-event-image" placeholder="Upload an image with max size 10MB">
                                 </div>
 
-                                <button type="submit" class="btn btn-primary">Create Event</button>
-                                <a href="${pageContext.request.contextPath}/events" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary" ui_test="add-event-button">Create Event</button>
+                                <a href="${pageContext.request.contextPath}/events" class="btn btn-secondary" ui_test="cancel-add-event-button">Cancel</a>
                             </form>
                         </c:when>
                         <c:otherwise>
                             <div class="alert alert-warning">
                                 <strong>No venues found!</strong> Please create a venue before adding events.
                             </div>
-                            <a href="${pageContext.request.contextPath}/venues/add" class="btn btn-success">
+                            <a href="${pageContext.request.contextPath}/venues/add" class="btn btn-success" ui_test="add-venue-button">
                                 + Create New Venue
                             </a>
                         </c:otherwise>

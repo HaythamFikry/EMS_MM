@@ -18,30 +18,30 @@
             <form method="post" action="${pageContext.request.contextPath}/venues/add">
                 <div class="mb-3">
                     <label class="form-label">Venue Name</label>
-                    <input type="text" name="name" class="form-control" required>
+                    <input type="text" name="name" class="form-control" ui_test="add-venue-name" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Address</label>
-                    <input type="text" name="address" class="form-control" required>
+                    <input type="text" name="address" class="form-control" ui_test="add-venue-address" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Capacity</label>
-                    <input type="number" name="capacity" class="form-control" min="1" max="100000" required>
+                    <input type="number" name="capacity" class="form-control" min="1" max="100000" ui_test="add-venue-capacity" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Contact Person</label>
-                    <input type="text" name="contactPerson" class="form-control">
+                    <input type="text" name="contactPerson" class="form-control" ui_test="add-venue-contact-person">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Phone</label>
-                    <input type="text" name="contactPhone" class="form-control" pattern="^[+]?[0-9]{10,15}$" title="Enter a valid phone number (10-15 digits)"
+                    <input type="text" name="contactPhone" class="form-control" ui_test="add-venue-contact-phone" pattern="^[+]?[0-9]{10,15}$" title="Enter a valid phone number (10-15 digits)"
                     >
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Email</label>
-                    <input type="email" name="contactEmail" class="form-control">
+                    <input type="email" name="contactEmail" class="form-control" ui_test="add-venue-contact-email">
                 </div>
-                <button type="submit" class="btn btn-primary">Add Venue</button>
+                <button type="submit" class="btn btn-primary" ui_test="submit-venue-button">Add Venue</button>
             </form>
 
             <script>

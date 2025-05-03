@@ -24,60 +24,60 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="firstName">First Name</label>
-                                <input type="text" class="form-control" id="firstName" name="firstName" required>
+                                <input type="text" class="form-control" id="firstName" name="firstName" ui_test="register-first-name" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="lastName">Last Name</label>
-                                <input type="text" class="form-control" id="lastName" name="lastName" required>
+                                <input type="text" class="form-control" id="lastName" name="lastName" ui_test="register-last-name" required>
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="email">Email Address</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
+                        <input type="email" class="form-control" id="email" name="email" ui_test="register-email" required>
                     </div>
 
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
+                        <input type="text" class="form-control" id="username" name="username" ui_test="register-username" required>
                     </div>
 
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+                        <input type="password" class="form-control" id="password" name="password" ui_test="register-password" required>
                     </div>
 
                     <div class="form-group">
                         <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" ui_test="register-confirm-password" required>
                     </div>
 
                     <div class="form-group">
                         <label for="role">Account Type</label>
-                        <select class="form-control" id="role" name="role" required>
+                        <select class="form-control" id="role" name="role" ui_test="register-role" required>
                             <option value="">Select account type...</option>
-                            <option value="ATTENDEE">Attendee</option>
-                            <option value="ORGANIZER">Event Organizer</option>
+                            <option value="ATTENDEE" ui_test="register-attendee">Attendee</option>
+                            <option value="ORGANIZER" ui_test="register-organizer">Event Organizer</option>
                         </select>
                     </div>
 
                     <div class="form-group form-check">
-                        <input type="checkbox" class="form-check-input" id="termsAgreement" name="termsAgreement" required>
+                        <input type="checkbox" class="form-check-input" id="termsAgreement" name="termsAgreement" ui_test="register-terms" required>
                         <label class="form-check-label" for="termsAgreement">
                             I agree to the 
-                            <button id="term" type="button" class="btn btn-link p-0 align-baseline">Terms and Conditions</button>
+                            <button id="term" type="button" class="btn btn-link p-0 align-baseline" ui_test="register-terms-button">Terms and Conditions</button>
                         </label>
                     </div>
 
                     <div class="form-group">
-                        <button type="submit" class="btn btn-primary btn-block">Register</button>
+                        <button type="submit" class="btn btn-primary btn-block" ui_test="register-button">Register</button>
                     </div>
 
                     <div class="text-center">
-                        <a href="${pageContext.request.contextPath}/login">Already have an account? Login</a>
+                        <a href="${pageContext.request.contextPath}/login" ui_test="register-login-link">Already have an account? Login</a>
                     </div>
                 </form>
             </div>

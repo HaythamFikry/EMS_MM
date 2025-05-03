@@ -48,7 +48,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Venue List</h2>
         <c:if test="${sessionScope.user.role == 'ORGANIZER'}">
-            <a href="${pageContext.request.contextPath}/venues/add" class="btn btn-success">+ Add Venue</a>
+            <a href="${pageContext.request.contextPath}/venues/add" class="btn btn-success" ui_test="add-venue-button">+ Add Venue</a>
         </c:if>
     </div>
 

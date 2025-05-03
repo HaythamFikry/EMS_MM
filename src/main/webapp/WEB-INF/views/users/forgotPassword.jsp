@@ -33,15 +33,15 @@
         <form action="${pageContext.request.contextPath}/forgotPassword" method="post">
           <div class="form-group">
             <label for="email">Email Address</label>
-            <input type="email" class="form-control" id="email" name="email" required>
+            <input type="email" class="form-control" id="email" name="email" ui_test="forgot-password-email" required>
           </div>
 
           <div class="form-group">
-            <button type="submit" class="btn btn-primary btn-block">Send Reset Link</button>
+            <button type="submit" class="btn btn-primary btn-block" ui_test="forgot-password-button">Send Reset Link</button>
           </div>
 
           <div class="text-center mt-3">
-            <a href="${pageContext.request.contextPath}/login">Back to Login</a>
+            <a href="${pageContext.request.contextPath}/login" ui_test="back-to-login-button">Back to Login</a>
           </div>
         </form>
       </div>

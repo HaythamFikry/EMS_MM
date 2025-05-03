@@ -15,12 +15,12 @@
     <!-- Nav Tabs -->
     <ul class="nav nav-tabs" id="eventTabs" role="tablist">
         <li class="nav-item">
-            <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab" aria-controls="upcoming" aria-selected="true">
+            <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab" aria-controls="upcoming" aria-selected="true" ui_test="events-upcoming-tab">
                 Upcoming Events
             </button>
         </li>
         <li class="nav-item">
-            <button class="nav-link" id="canceled-tab" data-bs-toggle="tab" data-bs-target="#canceled" type="button" role="tab" aria-controls="canceled" aria-selected="false">
+            <button class="nav-link" id="canceled-tab" data-bs-toggle="tab" data-bs-target="#canceled" type="button" role="tab" aria-controls="canceled" aria-selected="false" ui_test="events-canceled-tab">
                 Canceled Events
             </button>
         </li>
@@ -39,7 +39,7 @@
                                     <c:if test="${not empty event.imageUrl}">
                                         <img src="${pageContext.request.contextPath}/${event.imageUrl}" class="card-img-top" alt="${event.title}">
                                     </c:if>
-                                    <div class="card-body">
+                                    <div class="card-body card-link" href="${pageContext.request.contextPath}/events/${event.eventId}">
                                         <h5 class="card-title">
                                             <a href="${pageContext.request.contextPath}/events/${event.eventId}" class="text-decoration-none text-dark">
                                                 <c:out value="${event.title}" />

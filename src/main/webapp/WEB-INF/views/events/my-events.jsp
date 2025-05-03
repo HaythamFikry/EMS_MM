@@ -15,7 +15,7 @@
             <h1>My Events</h1>
         </div>
         <div class="col-auto">
-            <a href="${pageContext.request.contextPath}/events/new" class="btn btn-primary">
+            <a href="${pageContext.request.contextPath}/events/new" class="btn btn-primary" ui_test="create-event-button">
                 <i class="fas fa-plus"></i> Create New Event
             </a>
         </div>

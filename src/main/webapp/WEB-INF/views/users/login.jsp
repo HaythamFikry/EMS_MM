@@ -25,12 +25,12 @@
                 <form action="${pageContext.request.contextPath}/login" method="post">
                     <div class="form-group">
                         <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required>
+                        <input type="text" class="form-control" id="username" name="username" ui_test="login-username" required>
                     </div>
 
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+                        <input type="password" class="form-control" id="password" name="password" ui_test="login-password" required>
                     </div>
 
                     <div class="form-group form-check">
@@ -39,7 +39,7 @@
                     </div>
 
                     <div class="form-group">
-                        <button type="submit" class="btn btn-primary btn-block">Login</button>
+                        <button type="submit" class="btn btn-primary btn-block" ui_test="login-button">Login</button>
                     </div>
 
 
