@@ -52,7 +52,8 @@ public class EventDAO {
         }
     }
 
-    public boolean isVenueAvailable(int venueId,int eventId, LocalDateTime start, LocalDateTime end) throws SQLException {
+    public boolean isVenueAvailable(int venueId, int eventId, LocalDateTime start, LocalDateTime end)
+            throws SQLException {
         LocalDate startDate = start.toLocalDate();
         LocalDate endDate = end.toLocalDate();
 
@@ -104,7 +105,8 @@ public class EventDAO {
     }
 
     public Event getEventById(int eventId) throws SQLException {
-        String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, u.password_hash, " +
+        String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, u.password_hash, "
+                +
                 "v.venue_id, v.name as venue_name, v.address, v.capacity " +
                 "FROM events e " +
                 "JOIN users u ON e.organizer_id = u.user_id " +
@@ -124,7 +126,8 @@ public class EventDAO {
     }
 
     public List<Event> getAllEvents() throws SQLException {
-        String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, u.password_hash, " +
+        String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, u.password_hash, "
+                +
                 "v.venue_id, v.name as venue_name, v.address, v.capacity " +
                 "FROM events e " +
                 "JOIN users u ON e.organizer_id = u.user_id " +
@@ -134,7 +137,7 @@ public class EventDAO {
         List<Event> events = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 events.add(mapRowToEvent(rs));
             }
@@ -144,7 +147,8 @@ public class EventDAO {
     }
 
     public List<Event> getEventsByOrganizer(int organizerId) throws SQLException {
-        String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, u.password_hash, " +
+        String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, u.password_hash, "
+                +
                 "v.venue_id, v.name as venue_name, v.address, v.capacity " +
                 "FROM events e " +
                 "JOIN users u ON e.organizer_id = u.user_id " +
@@ -216,8 +220,7 @@ public class EventDAO {
                     rs.getInt("venue_id"),
                     rs.getString("venue_name"),
                     rs.getString("address"),
-                    rs.getInt("capacity")
-            );
+                    rs.getInt("capacity"));
         }
 
         Event event = new Event(
@@ -228,8 +231,7 @@ public class EventDAO {
                 rs.getTimestamp("end_datetime").toLocalDateTime(),
                 venue,
                 organizer,
-                rs.getString("image_url")
-        );
+                rs.getString("image_url"));
 
         event.setStatus(Event.EventStatus.valueOf(rs.getString("status")));
         event.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
@@ -246,12 +248,12 @@ public class EventDAO {
                 rs.getString("email"),
                 rs.getString("first_name"),
                 rs.getString("last_name"),
-                User.UserRole.valueOf(rs.getString("role"))
-        );
+                User.UserRole.valueOf(rs.getString("role")));
     }
 
     public List<Event> getAllNotCancelledEvents() throws SQLException {
-        String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, u.password_hash, " +
+        String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, u.password_hash, "
+                +
                 "v.venue_id, v.name as venue_name, v.address, v.capacity " +
                 "FROM events e " +
                 "JOIN users u ON e.organizer_id = u.user_id " +
@@ -262,7 +264,7 @@ public class EventDAO {
         List<Event> events = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 events.add(mapRowToEvent(rs));
@@ -273,7 +275,8 @@ public class EventDAO {
     }
 
     public List<Event> getCanceledEvents() throws SQLException {
-        String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, u.password_hash, " +
+        String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, u.password_hash, "
+                +
                 "v.venue_id, v.name as venue_name, v.address, v.capacity " +
                 "FROM events e " +
                 "JOIN users u ON e.organizer_id = u.user_id " +
@@ -284,7 +287,7 @@ public class EventDAO {
         List<Event> events = new ArrayList<>();
 
         try (PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 events.add(mapRowToEvent(rs));

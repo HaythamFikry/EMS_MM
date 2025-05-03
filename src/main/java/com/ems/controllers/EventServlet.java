@@ -16,10 +16,9 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-@WebServlet(name = "EventServlet", urlPatterns = {"/events", "/events/*","/my-events"})
-@MultipartConfig(
-        fileSizeThreshold = 1024 * 1024, // 1 MB
-        maxFileSize = 10 * 1024 * 1024,   // 5 MB
+@WebServlet(name = "EventServlet", urlPatterns = { "/events", "/events/*", "/my-events" })
+@MultipartConfig(fileSizeThreshold = 1024 * 1024, // 1 MB
+        maxFileSize = 10 * 1024 * 1024, // 5 MB
         maxRequestSize = 15 * 1024 * 1024 // 10 MB
 )
 
@@ -47,7 +46,7 @@ public class EventServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
-        System.out.println(pathInfo+" in EventServlet doGet");
+        System.out.println(pathInfo + " in EventServlet doGet");
         if (pathInfo == null || pathInfo.equals("/")) {
             // List all events
             listEvents(request, response);
@@ -101,8 +100,7 @@ public class EventServlet extends HttpServlet {
             List<Event> upcomingEvents = eventService.getAllNotCancelledEvents();
             List<Event> canceledEvents = eventService.getCanceledEvents();
 
-            for(Event event:canceledEvents)
-            {
+            for (Event event : canceledEvents) {
                 System.out.println(event.getStatus());
             }
 
@@ -181,7 +179,7 @@ public class EventServlet extends HttpServlet {
                 return;
             }
 
-            List<Venue>venues =VenueService.getAllVenues();
+            List<Venue> venues = VenueService.getAllVenues();
 
             request.setAttribute("event", event);
             request.setAttribute("venues", venues);
@@ -214,34 +212,28 @@ public class EventServlet extends HttpServlet {
             Date startDate = Date.from(event.getStartDateTime().atZone(ZoneId.systemDefault()).toInstant());
             Date endDate = Date.from(event.getEndDateTime().atZone(ZoneId.systemDefault()).toInstant());
 
-            int ticketsSold=0;
-            int totalCapacity=0;
-            List<Ticket>tickets = ticketService.getTicketsByEvent(eventId);
-            if(tickets.isEmpty())
-            {
-                ticketsSold=orderService.getSoldQuantityByEventID(eventId);
-                totalCapacity=ticketsSold;
-            }
-            else
-            {
-                for(Ticket ticket : tickets){
+            int ticketsSold = 0;
+            int totalCapacity = 0;
+            List<Ticket> tickets = ticketService.getTicketsByEvent(eventId);
+            if (tickets.isEmpty()) {
+                ticketsSold = orderService.getSoldQuantityByEventID(eventId);
+                totalCapacity = ticketsSold;
+            } else {
+                for (Ticket ticket : tickets) {
                     ticketsSold += orderService.getTotalQuantityByTicketId(ticket.getTicketId());
-                    totalCapacity += ticket.getQuantityAvailable()+orderService.getTotalQuantityByTicketId(ticket.getTicketId());
+                    totalCapacity += ticket.getQuantityAvailable()
+                            + orderService.getTotalQuantityByTicketId(ticket.getTicketId());
                 }
             }
 
-
-           List<Ticket>isAvailableTickets=new ArrayList<>();
-           for (Ticket ticket : tickets) {
-               if (ticket.getQuantityAvailable() > 0) {
-                   isAvailableTickets.add(ticket);
-               }
-               else
-               {
-                   ticketService.deleteTicket(ticket.getTicketId());
-               }
-           }
-
+            List<Ticket> isAvailableTickets = new ArrayList<>();
+            for (Ticket ticket : tickets) {
+                if (ticket.getQuantityAvailable() > 0) {
+                    isAvailableTickets.add(ticket);
+                } else {
+                    ticketService.deleteTicket(ticket.getTicketId());
+                }
+            }
 
             request.setAttribute("event", event);
             request.setAttribute("startDate", startDate);
@@ -262,7 +254,6 @@ public class EventServlet extends HttpServlet {
 
     private void createEvent(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
 
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
@@ -285,9 +276,8 @@ public class EventServlet extends HttpServlet {
             return;
         }
 
-
         // Check venue availability before creating the event
-        if (!eventService.isVenueAvailable(venueId,-1, startDateTime, endDateTime)) {
+        if (!eventService.isVenueAvailable(venueId, -1, startDateTime, endDateTime)) {
             request.setAttribute("error", "The selected venue is already booked during this time.");
             List<Venue> venues = VenueService.getAllVenues(); // for repopulating the form
             request.setAttribute("venues", venues);
@@ -295,34 +285,27 @@ public class EventServlet extends HttpServlet {
             return;
         }
 
-
         if (user == null || user.getRole() != User.UserRole.ORGANIZER) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
-
-
-// Handle file upload
+        // Handle file upload
         String imageUrl = null;
         Part filePart = request.getPart("eventImage");
         if (filePart != null && filePart.getSize() > 0) {
             imageUrl = FileUtils.saveEventImage(filePart, request.getServletContext().getRealPath(""));
         }
 
-
-
         try {
             String title = request.getParameter("title");
             String description = request.getParameter("description");
             startDateTime = LocalDateTime.parse(
                     request.getParameter("startDateTime"),
-                    DateTimeFormatter.ISO_LOCAL_DATE_TIME
-            );
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             endDateTime = LocalDateTime.parse(
                     request.getParameter("endDateTime"),
-                    DateTimeFormatter.ISO_LOCAL_DATE_TIME
-            );
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             // Get current user as organizer
             User organizer = (User) request.getSession().getAttribute("user");
             Venue venue = new Venue(venueId, null, null, 0); // only ID is required
@@ -375,53 +358,44 @@ public class EventServlet extends HttpServlet {
             event.setDescription(request.getParameter("description"));
             event.setStartDateTime(LocalDateTime.parse(
                     request.getParameter("startDateTime"),
-                    DateTimeFormatter.ISO_LOCAL_DATE_TIME
-            ));
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME));
             event.setEndDateTime(LocalDateTime.parse(
                     request.getParameter("endDateTime"),
-                    DateTimeFormatter.ISO_LOCAL_DATE_TIME
-            ));
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME));
 
             if (LocalDateTime.parse(
                     request.getParameter("endDateTime"),
-                    DateTimeFormatter.ISO_LOCAL_DATE_TIME
-            ).isBefore(LocalDateTime.parse(
-                    request.getParameter("startDateTime"),
-                    DateTimeFormatter.ISO_LOCAL_DATE_TIME
-            ))) {
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME).isBefore(
+                            LocalDateTime.parse(
+                                    request.getParameter("startDateTime"),
+                                    DateTimeFormatter.ISO_LOCAL_DATE_TIME))) {
                 request.setAttribute("error", "End date cannot be earlier than start date");
                 // Redirect back to the form page
                 request.getRequestDispatcher("/WEB-INF/views/events/new.jsp").forward(request, response);
                 return;
             }
 
-
-
-
             // Check venue availability before updating the event
-            if(request.getParameter("venueId").equals(""))
-            {
+            if (request.getParameter("venueId").equals("")) {
                 request.setAttribute("error", "Please select a venue");
                 // Redirect back to the form page
                 request.getRequestDispatcher("/WEB-INF/views/events/new.jsp").forward(request, response);
                 return;
             }
-            Venue venue =VenueService.getVenueById(Integer.parseInt(request.getParameter("venueId"))) ;
+            Venue venue = VenueService.getVenueById(Integer.parseInt(request.getParameter("venueId")));
             event.setVenue(venue);
-
 
             int venueId = Integer.parseInt(request.getParameter("venueId"));
             LocalDateTime startDateTime = LocalDateTime.parse(request.getParameter("startDateTime"));
             LocalDateTime endDateTime = LocalDateTime.parse(request.getParameter("endDateTime"));
 
-            if (!eventService.isVenueAvailable(venueId,eventId,startDateTime, endDateTime)) {
+            if (!eventService.isVenueAvailable(venueId, eventId, startDateTime, endDateTime)) {
                 request.setAttribute("error", "The selected venue is already booked during this time.");
                 List<Venue> venues = VenueService.getAllVenues(); // for repopulating the form
                 request.setAttribute("venues", venues);
                 request.getRequestDispatcher("/WEB-INF/views/events/new.jsp").forward(request, response);
                 return;
             }
-
 
             // Handle image
             boolean removeImage = "on".equals(request.getParameter("removeImage"));
@@ -446,13 +420,10 @@ public class EventServlet extends HttpServlet {
                 event.setImageUrl(imageUrl);
             }
 
-            if(request.getParameter("status").equals(""))
-            {
+            if (request.getParameter("status").equals("")) {
                 request.setAttribute("error", "Please select a status");
                 return;
-            }
-            else
-            {
+            } else {
                 event.setStatus(Event.EventStatus.valueOf(request.getParameter("status").toUpperCase()));
             }
 
