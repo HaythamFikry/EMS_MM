@@ -28,9 +28,27 @@ public class EventService {
         this.eventDAO = new EventDAO(connection);
     }
 
+    // Constructor For Mock
+    public EventService(EventDAO eventDAO) {
+        this.eventDAO = eventDAO;
+    }
+
     // Create a new event
     public Event createEvent(String title, String description, LocalDateTime startDateTime,
                              LocalDateTime endDateTime, User organizer, Venue venue) {
+
+        // Validate title and organizer are not null
+        if (title == null) {
+            throw new NullPointerException("Title cannot be null");
+        }
+        if (organizer == null) {
+            throw new NullPointerException("Organizer cannot be null");
+        }
+
+        // Validate date range
+        if (startDateTime != null && endDateTime != null && endDateTime.isBefore(startDateTime)) {
+            throw new IllegalArgumentException("End date cannot be before start date");
+        }
         Event event = new Event(0, title, description, startDateTime, endDateTime, venue, organizer, null);
         try {
             event = eventDAO.createEvent(event);
@@ -39,6 +57,7 @@ public class EventService {
             throw new EventManagementException("Failed to create event", e);
         }
     }
+
 
 
 

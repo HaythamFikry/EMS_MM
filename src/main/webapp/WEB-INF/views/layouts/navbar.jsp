@@ -24,12 +24,12 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="/EventManagementSystemV2_war/">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="/EventManagementSystemV2_war/events">Events</a></li>
+                <li class="nav-item"><a class="nav-link" href="/EventManagementSystemV2/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/EventManagementSystemV2/events">Events</a></li>
                 <li class="nav-item"><a class="nav-link" href="${pageContext.request.contextPath}/venues">Venues</a></li>
 
-                <li class="nav-item"><a class="nav-link" href="/EventManagementSystemV2_war/profile">Profile</a></li>
-                <li class="nav-item"><a class="nav-link" href="/EventManagementSystemV2_war/logout">Logout</a></li>
+                <li class="nav-item"><a class="nav-link" href="/EventManagementSystemV2/profile">Profile</a></li>
+                <li class="nav-item"><a class="nav-link" href="/EventManagementSystemV2/logout">Logout</a></li>
                 <a class="nav-link" href="${pageContext.request.contextPath}/feedback/my">feedback</a>
             </ul>
         </div>
