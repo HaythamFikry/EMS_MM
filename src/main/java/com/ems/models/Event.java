@@ -26,15 +26,14 @@ public class Event {
     private List<Feedback> feedbacks;
 
     public Event() {
-
     }
 
     public enum EventStatus {
         DRAFT, PUBLISHED, CANCELLED, COMPLETED
     }
 
-    public Event(int eventId, String title, String description, LocalDateTime startDateTime,
-                 LocalDateTime endDateTime, Venue venue, User organizer, String imageUrl) {
+    public Event(int eventId, String title, String description, LocalDateTime startDateTime, LocalDateTime endDateTime,
+            Venue venue, User organizer, String imageUrl) {
         this.eventId = eventId;
         this.title = title;
         this.description = description;
@@ -51,35 +50,85 @@ public class Event {
     }
 
     // Getters and setters
-    public int getEventId() { return eventId; }
-    public void setEventId(int eventId) { this.eventId = eventId; }
+    public int getEventId() {
+        return eventId;
+    }
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public void setEventId(int eventId) {
+        this.eventId = eventId;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getTitle() {
+        return title;
+    }
 
-    public LocalDateTime getStartDateTime() { return startDateTime; }
-    public void setStartDateTime(LocalDateTime startDateTime) { this.startDateTime = startDateTime; }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    public LocalDateTime getEndDateTime() { return endDateTime; }
-    public void setEndDateTime(LocalDateTime endDateTime) { this.endDateTime = endDateTime; }
+    public String getDescription() {
+        return description;
+    }
 
-    public Venue getVenue() { return venue; }
-    public void setVenue(Venue venue) { this.venue = venue; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-    public User getOrganizer() { return organizer; }
-    public void setOrganizer(User organizer) { this.organizer = organizer; }
+    public LocalDateTime getStartDateTime() {
+        return startDateTime;
+    }
 
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public void setStartDateTime(LocalDateTime startDateTime) {
+        this.startDateTime = startDateTime;
+    }
 
-    public EventStatus getStatus() { return status; }
-    public void setStatus(EventStatus status) { this.status = status; }
+    public LocalDateTime getEndDateTime() {
+        return endDateTime;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setEndDateTime(LocalDateTime endDateTime) {
+        this.endDateTime = endDateTime;
+    }
+
+    public Venue getVenue() {
+        return venue;
+    }
+
+    public void setVenue(Venue venue) {
+        this.venue = venue;
+    }
+
+    public User getOrganizer() {
+        return organizer;
+    }
+
+    public void setOrganizer(User organizer) {
+        this.organizer = organizer;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public EventStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(EventStatus status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
     public String getFormattedStartDateTime() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, MMM d, yyyy h:mm a");
@@ -91,14 +140,29 @@ public class Event {
         return endDateTime != null ? endDateTime.format(formatter) : "";
     }
 
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 
-    public List<Ticket> getTickets() { return tickets; }
-    public void setTickets(List<Ticket> tickets) { this.tickets = tickets; }
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 
-    public List<Feedback> getFeedbacks() { return feedbacks; }
-    public void setFeedbacks(List<Feedback> feedbacks) { this.feedbacks = feedbacks; }
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
+    }
+
+    public List<Feedback> getFeedbacks() {
+        return feedbacks;
+    }
+
+    public void setFeedbacks(List<Feedback> feedbacks) {
+        this.feedbacks = feedbacks;
+    }
 
     // Business methods
     public void addTicket(Ticket ticket) {
@@ -114,7 +178,8 @@ public class Event {
     }
 
     public double getAverageRating() {
-        if (feedbacks.isEmpty()) return 0;
+        if (feedbacks.isEmpty())
+            return 0;
         return feedbacks.stream()
                 .mapToInt(Feedback::getRating)
                 .average()
@@ -133,9 +198,9 @@ public class Event {
                 '}';
     }
 
-
     public String getFormattedStartDate() {
-        if (startDateTime == null) return "";
+        if (startDateTime == null)
+            return "";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, MMM d, yyyy h:mm a");
         return startDateTime.format(formatter);
     }

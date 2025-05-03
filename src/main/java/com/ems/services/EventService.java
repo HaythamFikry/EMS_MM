@@ -16,8 +16,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
+ * 
  * Service class for event management operations.
  * Follows Single Responsibility Principle by focusing only on event-related operations.
+ * 
  */
 public class EventService {
     private EventDAO eventDAO;
@@ -30,7 +32,7 @@ public class EventService {
 
     // Constructor For Mock
     public EventService(EventDAO eventDAO) {
-        this.eventDAO = eventDAO;
+        this.eventDAO = eventDAO; 
     }
 
     // Create a new event
@@ -38,20 +40,20 @@ public class EventService {
                              LocalDateTime endDateTime, User organizer, Venue venue) {
 
         // Validate title and organizer are not null
-        if (title == null) {
+        if (title ==  null) {
             throw new NullPointerException("Title cannot be null");
         }
-        if (organizer == null) {
+        if (organizer ==  null) {
             throw new NullPointerException("Organizer cannot be null");
         }
 
         // Validate date range
-        if (startDateTime != null && endDateTime != null && endDateTime.isBefore(startDateTime)) {
+        if (startDateTime !=  null && endDateTime != null && endDateTime.isBefore(startDateTime)) {
             throw new IllegalArgumentException("End date cannot be before start date");
         }
-        Event event = new Event(0, title, description, startDateTime, endDateTime, venue, organizer, null);
+        Event event =  new Event(0, title, description, startDateTime, endDateTime, venue, organizer, null);
         try {
-            event = eventDAO.createEvent(event);
+            event  = eventDAO.createEvent(event);
             return event;
         } catch (SQLException e) {
             throw new EventManagementException("Failed to create event", e);

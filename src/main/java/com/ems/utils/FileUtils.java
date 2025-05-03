@@ -9,7 +9,8 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 public class FileUtils {
-    private static final String UPLOAD_DIRECTORY = "event-images";
+    
+    private static final String UPLOAD_DIRECTORY =  "event-images";
 
     public static String saveEventImage(Part filePart, String contextPath) throws IOException {
         // Create upload directory if it doesn't exist
