@@ -17,6 +17,10 @@ public class VenueService {
         this.venueDao = new VenueDAO(connection);
     }
 
+    public VenueService(VenueDAO venueDao) {
+        this.venueDao = venueDao;
+    }
+    
     public boolean updateVenue(Venue venue) throws EventManagementException {
         try {
             return venueDao.updateVenue(venue);
