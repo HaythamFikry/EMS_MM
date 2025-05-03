@@ -16,6 +16,13 @@ public class TicketService {
     private TicketDAO ticketDAO;
     private Connection connection;
 
+    
+        // Constructor for dependency injection
+        public TicketService(TicketDAO ticketDAO) {
+            this.ticketDAO = ticketDAO;
+        }
+
+        
     // Private constructor so external code can't instantiate
     public TicketService() {
         this.connection = DatabaseConnection.getInstance().getConnection();

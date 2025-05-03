@@ -20,15 +20,17 @@ public class TicketDAO {
 
     /**
      * Creates a new ticket in the database.
+     * 
      * @return The created ticket with generated ID
      * @throws SQLException If database error occurs
      */
     // In TicketDAO.java
+
     public List<Ticket> getAllTickets() throws SQLException {
         String sql = "SELECT * FROM tickets";
         List<Ticket> tickets = new ArrayList<>();
         try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 Ticket ticket = new Ticket(
                         rs.getInt("ticket_id"),
@@ -38,13 +40,13 @@ public class TicketDAO {
                         rs.getInt("quantity_available"),
                         null, // Sale start date
                         null, // Sale end date
-                        rs.getString("description")
-                );
+                        rs.getString("description"));
                 tickets.add(ticket);
             }
         }
         return tickets;
     }
+
     public Ticket createTicket(Ticket ticket) throws SQLException {
         String sql = "INSERT INTO tickets (event_id, ticket_type, price, quantity_available, " +
                 "sale_start_date, sale_end_date, description) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -54,10 +56,9 @@ public class TicketDAO {
             stmt.setString(2, ticket.getTicketType());
             stmt.setDouble(3, ticket.getPrice());
             stmt.setInt(4, ticket.getQuantityAvailable());
-            stmt.setTimestamp(5, ticket.getSaleStartDate() != null ?
-                    Timestamp.valueOf(ticket.getSaleStartDate()) : null);
-            stmt.setTimestamp(6, ticket.getSaleEndDate() != null ?
-                    Timestamp.valueOf(ticket.getSaleEndDate()) : null);
+            stmt.setTimestamp(5,
+                    ticket.getSaleStartDate() != null ? Timestamp.valueOf(ticket.getSaleStartDate()) : null);
+            stmt.setTimestamp(6, ticket.getSaleEndDate() != null ? Timestamp.valueOf(ticket.getSaleEndDate()) : null);
             stmt.setString(7, ticket.getDescription());
 
             int affectedRows = stmt.executeUpdate();
@@ -79,6 +80,7 @@ public class TicketDAO {
 
     /**
      * Updates an existing ticket in the database.
+     * 
      * @param ticket The ticket to update
      * @return The updated ticket
      * @throws SQLException If database error occurs
@@ -92,10 +94,9 @@ public class TicketDAO {
             stmt.setString(1, ticket.getTicketType());
             stmt.setDouble(2, ticket.getPrice());
             stmt.setInt(3, ticket.getQuantityAvailable());
-            stmt.setTimestamp(4, ticket.getSaleStartDate() != null ?
-                    Timestamp.valueOf(ticket.getSaleStartDate()) : null);
-            stmt.setTimestamp(5, ticket.getSaleEndDate() != null ?
-                    Timestamp.valueOf(ticket.getSaleEndDate()) : null);
+            stmt.setTimestamp(4,
+                    ticket.getSaleStartDate() != null ? Timestamp.valueOf(ticket.getSaleStartDate()) : null);
+            stmt.setTimestamp(5, ticket.getSaleEndDate() != null ? Timestamp.valueOf(ticket.getSaleEndDate()) : null);
             stmt.setString(6, ticket.getDescription());
             stmt.setInt(7, ticket.getTicketId());
 
@@ -110,6 +111,7 @@ public class TicketDAO {
 
     /**
      * Deletes a ticket from the database.
+     * 
      * @param ticketId The ID of the ticket to delete
      * @throws SQLException If database error occurs
      */
@@ -124,6 +126,7 @@ public class TicketDAO {
 
     /**
      * Retrieves a ticket by its ID.
+     * 
      * @param ticketId The ID of the ticket to retrieve
      * @return The ticket, or null if not found
      * @throws SQLException If database error occurs
@@ -148,6 +151,7 @@ public class TicketDAO {
 
     /**
      * Retrieves all tickets for a specific event.
+     * 
      * @param eventId The ID of the event
      * @return List of tickets for the event
      * @throws SQLException If database error occurs
@@ -176,8 +180,10 @@ public class TicketDAO {
 
     /**
      * Updates the available quantity of a ticket.
-     * @param ticketId The ID of the ticket
-     * @param quantityChange The change in quantity (positive to add, negative to subtract)
+     * 
+     * @param ticketId       The ID of the ticket
+     * @param quantityChange The change in quantity (positive to add, negative to
+     *                       subtract)
      * @throws SQLException If database error occurs
      */
     public void updateTicketQuantity(int ticketId, int quantityChange) throws SQLException {
@@ -197,6 +203,7 @@ public class TicketDAO {
 
     /**
      * Helper method to map a ResultSet row to a Ticket object.
+     * 
      * @param rs The ResultSet containing ticket data
      * @return A Ticket object
      * @throws SQLException If database error occurs
@@ -211,7 +218,7 @@ public class TicketDAO {
                 rs.getTimestamp("end_datetime").toLocalDateTime(),
                 null, // venue not needed here
                 null, // organizer not needed here
-                null  // image URL not needed here
+                null // image URL not needed here
         );
 
         // Create Ticket object
@@ -223,8 +230,7 @@ public class TicketDAO {
                 rs.getInt("quantity_available"),
                 rs.getTimestamp("sale_start_date").toLocalDateTime(),
                 rs.getTimestamp("sale_end_date").toLocalDateTime(),
-                rs.getString("description")
-        );
+                rs.getString("description"));
 
         // Set optional dates
         Timestamp saleStart = rs.getTimestamp("sale_start_date");
