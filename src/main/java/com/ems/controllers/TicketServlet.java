@@ -319,7 +319,7 @@ public class TicketServlet extends HttpServlet {
             }
 
             if (startDateTime.isAfter(event.getStartDateTime())) {
-                session.setAttribute("error", "Ticket sale start date must be after event start date");
+                session.setAttribute("error", "Ticket sale start date must be Before event start date");
                 response.sendRedirect(request.getContextPath() + "/events/" + eventId);
                 return;
             }
