@@ -270,7 +270,14 @@ public class EventServlet extends HttpServlet {
         int venueId = Integer.parseInt(request.getParameter("venueId"));
         LocalDateTime startDateTime = LocalDateTime.parse(request.getParameter("startDateTime"));
         LocalDateTime endDateTime = LocalDateTime.parse(request.getParameter("endDateTime"));
-
+        // Validate start date against today's date
+        LocalDateTime today = LocalDateTime.now();
+        if (startDateTime.isBefore(today)) {
+            request.setAttribute("error", "Start date cannot be earlier than today's date");
+            // Redirect back to the form page
+            request.getRequestDispatcher("/WEB-INF/views/events/new.jsp").forward(request, response);
+            return;
+        }
         if (endDateTime.isBefore(startDateTime)) {
             request.setAttribute("error", "End date cannot be earlier than start date");
             // Redirect back to the form page
