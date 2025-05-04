@@ -139,6 +139,7 @@ public class EventServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
 
+
         if (user == null || user.getRole() != User.UserRole.ORGANIZER) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
@@ -293,6 +294,7 @@ public class EventServlet extends HttpServlet {
         }
 
 
+        
         if (user == null || user.getRole() != User.UserRole.ORGANIZER) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
