@@ -1,0 +1,51 @@
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++------------------+       +-------------------+       +---------------------+       +------------------+       +-----------------+
+|   JSP (View)     | <--> | Servlet (Controller)| <--> | Service Layer     | <--> | DAO Layer         | <-->  | Database (MySQL) |
+| (HTML + JSTL)    |      | (HttpServlet)      |       | (Business Logic)  |      | (JDBC/SQL)        |       |                  |
++------------------+       +-------------------+       +---------------------+       +------------------+       +-----------------+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+| Layer       | Responsibility                                                                             |
+| ----------- | ------------------------------------------------------------------------------------------ |
+| **JSP**     | Front-end view (forms, user inputs, messages)                                              |
+| **Servlet** | Receives HTTP requests, acts as a controller, interacts with services, and forwards to JSP |
+| **Service** | Contains business rules, validation, and security (e.g., password hashing)                 |
+| **DAO**     | Handles all DB operations via JDBC (CRUD operations)                                       |
+| **Model**   | Plain Java classes (POJOs) representing entities like `User`, `Event`, `Order`, etc.       |
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+3. High-Level Scenario: User Login
+Scenario: A user logs in through a form.
+Step-by-Step Flow
+1 User visits login.jsp
+    Displays login form
+    Form method = POST → /login
+2 Form submitted → Servlet (UserServlet)
+    Servlet mapped to /login in @WebServlet
+    Method: doPost()
+    Calls loginUser() method
+    Retrieves username/password from request
+3 Servlet → Service Layer (UserService)
+    Calls authenticateUser(username, password)
+    Hashes input password
+    Calls DAO to fetch user by username
+4 Service → DAO Layer (UserDAO)
+    Executes SQL: SELECT * FROM users WHERE username = ?
+    If user found → checks hashed password match
+5 Service returns User object
+    If match succeeds → returns User
+    If not → throws EventManagementException
+6 Servlet stores User in HttpSession
+    session.setAttribute("user", user)
+    Redirects to /profile or homepage
+7 User sees personalized homepage or profile JSP
+    Displays events, orders, feedback (based on role)
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+| Component          | Technology                      |
+| ------------------ | ------------------------------- |
+| View (UI)          | JSP + JSTL                      |
+| Controller         | Servlet API                     |
+| Business Logic     | Plain Java + Service Classes    |
+| DB Access          | JDBC + DAO Pattern              |
+| Security           | Password hashing (e.g., BCrypt) |
+| Database           | MySQL/PostgreSQL                |
+| Session Management | `HttpSession`                   |
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
