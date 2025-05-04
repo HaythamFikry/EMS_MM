@@ -49,7 +49,15 @@ public class Order {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public double getTotalAmount() { return totalAmount; }
+    // public double getTotalAmount() { return totalAmount; }
+
+    public double getTotalAmount() {
+        if (orderItems == null || orderItems.isEmpty()) {
+            return 0.0;
+        }
+
+        return orderItems.stream().mapToDouble(OrderItem::getFinalPrice).sum();
+    }
     public void setTotalAmount(double totalAmount) { this.totalAmount = totalAmount; }
 
     public String getPaymentMethod() { return paymentMethod; }

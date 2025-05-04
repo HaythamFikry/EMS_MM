@@ -99,13 +99,11 @@ public class EventServlet extends HttpServlet {
 
             List<Event> upcomingEvents = eventService.getAllNotCancelledEvents();
             List<Event> canceledEvents = eventService.getCanceledEvents();
-
-            for (Event event : canceledEvents) {
-                System.out.println(event.getStatus());
-            }
+            List<Event> pastEvents = eventService.getPastEvents(); // Add this line
 
             request.setAttribute("upcomingEvents", upcomingEvents);
             request.setAttribute("canceledEvents", canceledEvents);
+            request.setAttribute("pastEvents", pastEvents); // Add this line
             request.getRequestDispatcher("/WEB-INF/views/events/list.jsp").forward(request, response);
         } catch (EventManagementException e) {
             request.setAttribute("error", "Failed to retrieve events: " + e.getMessage());
@@ -139,6 +137,7 @@ public class EventServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
+
 
         if (user == null || user.getRole() != User.UserRole.ORGANIZER) {
             response.sendRedirect(request.getContextPath() + "/login");
@@ -285,6 +284,8 @@ public class EventServlet extends HttpServlet {
             return;
         }
 
+
+        
         if (user == null || user.getRole() != User.UserRole.ORGANIZER) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;

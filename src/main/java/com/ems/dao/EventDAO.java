@@ -52,8 +52,31 @@ public class EventDAO {
         }
     }
 
-    public boolean isVenueAvailable(int venueId, int eventId, LocalDateTime start, LocalDateTime end)
-            throws SQLException {
+
+    public List<Event> getPastEvents() throws SQLException {
+        String sql = "SELECT e.*, u.user_id, u.username, u.email, u.first_name, u.last_name, u.role, u.password_hash, " +
+                "v.venue_id, v.name as venue_name, v.address, v.capacity " +
+                "FROM events e " +
+                "JOIN users u ON e.organizer_id = u.user_id " +
+                "LEFT JOIN venues v ON e.venue_id = v.venue_id " +
+                "WHERE e.status != 'CANCELLED' AND e.status != 'DRAFT' " +
+                "AND e.end_datetime < CURRENT_DATE() " +
+                "ORDER BY e.start_datetime DESC";
+
+        List<Event> events = new ArrayList<>();
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                events.add(mapRowToEvent(rs));
+            }
+        }
+
+        return events;
+    }
+
+    public boolean isVenueAvailable(int venueId,int eventId, LocalDateTime start, LocalDateTime end) throws SQLException {
         LocalDate startDate = start.toLocalDate();
         LocalDate endDate = end.toLocalDate();
 
@@ -259,6 +282,7 @@ public class EventDAO {
                 "JOIN users u ON e.organizer_id = u.user_id " +
                 "LEFT JOIN venues v ON e.venue_id = v.venue_id " +
                 "WHERE e.status != 'CANCELLED' AND e.status != 'DRAFT' " +
+                "AND e.end_datetime >= CURRENT_DATE() " + // Add this condition
                 "ORDER BY e.start_datetime";
 
         List<Event> events = new ArrayList<>();

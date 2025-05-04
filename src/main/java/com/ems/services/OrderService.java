@@ -63,8 +63,8 @@ public class OrderService {
                 order.addOrderItem(item);
 
                 // Update ticket quantities
-                Ticket ticket = item.getTicket();
-                ticketDAO.updateTicketQuantity(ticket.getTicketId(), -item.getQuantity());
+                //Ticket ticket = item.getTicket();
+               // ticketDAO.updateTicketQuantity(ticket.getTicketId(), -item.getQuantity());
 
                 // Add the item to the database
                 orderDAO.createOrderItem(item, order.getOrderId());
@@ -104,8 +104,8 @@ public class OrderService {
                     order.addOrderItem(item);
 
                     // Update ticket quantities
-                    Ticket ticket = item.getTicket();
-                    ticketDAO.updateTicketQuantity(ticket.getTicketId(), -item.getQuantity());
+                    //Ticket ticket = item.getTicket();
+                  //  ticketDAO.updateTicketQuantity(ticket.getTicketId(), -item.getQuantity());
                 }
 
                 return orderDAO.createOrder(order);
@@ -140,9 +140,11 @@ public class OrderService {
                 throw new EventManagementException("Order not found");
             }
 
-            // Return tickets to inventory
-            for (OrderItem item : order.getOrderItems()) {
-                ticketDAO.updateTicketQuantity(item.getTicket().getTicketId(), item.getQuantity());
+            // Only return tickets to inventory if the order was PAID
+            if (Order.OrderStatus.PAID.toString().equals(order.getStatus())) {
+                for (OrderItem item : order.getOrderItems()) {
+                    ticketDAO.updateTicketQuantity(item.getTicket().getTicketId(), item.getQuantity());
+                }
             }
 
             orderDAO.updateOrderStatus(orderId, Order.OrderStatus.CANCELLED.toString());
@@ -179,7 +181,6 @@ public class OrderService {
     // Complete an order (after payment)
     public void completeOrder(int orderId) {
         try {
-
             // Get the order with items
             Order order = orderDAO.getOrderById(orderId);
 
@@ -187,10 +188,13 @@ public class OrderService {
                 throw new EventManagementException("Order not found");
             }
 
+            // Update order status to PAID
             orderDAO.updateOrderStatus(orderId, Order.OrderStatus.PAID.toString());
 
-            // Insert sold tickets for each order item
+            // NOW decrease the ticket quantities
             for (OrderItem item : order.getOrderItems()) {
+                ticketDAO.updateTicketQuantity(item.getTicket().getTicketId(), -item.getQuantity());
+
                 soldTicketDAO.insertSoldTicket(
                         item.getTicket().getTicketId(),
                         item.getTicket().getEvent().getEventId(),
