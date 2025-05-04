@@ -16,7 +16,7 @@ public class DatabaseConnection {
     // Works with Docker Containers
     // private static final String DB_URL = "jdbc:mysql://mysql:3306/event_management_system?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     // Works with Intellij and local DB
-     private static final String DB_URL = "jdbc:mysql://localhost:3306/event_management_system?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+     private static final String DB_URL = "jdbc:mysql://localhost:3306/event_management_system?useSSL=false&serverTimezone=UTC";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "7aKF^bH9LG&3QpXV";
 

@@ -58,6 +58,14 @@ public class EventService {
         }
     }
 
+    public List<Event> getPastEvents() {
+        try {
+            return eventDAO.getPastEvents();
+        } catch (SQLException e) {
+            throw new EventManagementException("Failed to retrieve past events", e);
+        }
+    }
+
 
 
 
