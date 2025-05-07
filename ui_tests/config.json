@@ -1,0 +1,20 @@
+{
+    "BASE_URL": "http://localhost:8080/EventManagementSystemV2/",
+    "LOGIN_URL": "login",
+    "REGISTER_URL": "register",
+    "LIST_VENUE_URL": "venues",
+    "ADD_VENUE_URL": "venues/add",
+    "LOGOUT_URL": "logout",
+    "CREATED_USER_ATTENDEE": {
+        "username": "jennifermoreno",
+        "email": "castanedajaime@example.com",
+        "password": "TestPass123!",
+        "role": "Attendee"
+    },
+    "CREATED_USER_ORGANIZER": {
+        "username": "joycefarmer",
+        "email": "jrussell@example.org",
+        "password": "TestPass123!",
+        "role": "Organizer"
+    }
+}
