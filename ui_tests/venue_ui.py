@@ -10,12 +10,15 @@ class TestAddVenueForm(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         
-        with open("tests/config.json") as f:
+        with open("ui_tests/config.json") as f:
             config = json.load(f)
             cls.BASE_URL = config["BASE_URL"]
             cls.LOGIN_URL = urllib.parse.urljoin(cls.BASE_URL, config["LOGIN_URL"])
             cls.LIST_VENUE_URL = urllib.parse.urljoin(cls.BASE_URL, config["LIST_VENUE_URL"])
             cls.ADD_VENUE_URL = urllib.parse.urljoin(cls.BASE_URL, config["ADD_VENUE_URL"])
+            CREATED_USER = config["CREATED_USER_ATTENDEE"] or config["CREATED_USER_ORGANIZER"] or {}
+            cls.USERNAME = CREATED_USER.get("username", "soliman")
+            cls.PASSWORD = CREATED_USER.get("password", "123")
 
 
         cls.options = Options()
@@ -28,11 +31,11 @@ class TestAddVenueForm(unittest.TestCase):
         # Log in the user
         username = cls.driver.find_elements(By.CSS_SELECTOR, 'input[ui_test="login-username"]')
         cls.assertTrue(username, "Username field not found")
-        username[0].send_keys("soliman")
+        username[0].send_keys(cls.USERNAME)
 
         password = cls.driver.find_elements(By.CSS_SELECTOR, 'input[ui_test="login-password"]')
         cls.assertTrue(password, "Password field not found")
-        password[0].send_keys("123")
+        password[0].send_keys(cls.PASSWORD)
         password[0].send_keys(Keys.RETURN)
 
         time.sleep(2)

@@ -8,26 +8,30 @@ import time,json,urllib
 class MyEventsPageTest(unittest.TestCase):
     @classmethod
     def setUp(cls):
-        with open("tests/config.json") as f:
+        with open("ui_tests/config.json") as f:
             config = json.load(f)
             cls.BASE_URL = config["BASE_URL"]
             cls.LOGIN_URL = urllib.parse.urljoin(cls.BASE_URL, config["LOGIN_URL"])
+            CREATED_USER = config["CREATED_USER_ATTENDEE"] or config["CREATED_USER_ORGANIZER"] or {}
+            cls.USERNAME = CREATED_USER.get("username", "soliman")
+            cls.PASSWORD = CREATED_USER.get("password", "123")
+
         
         cls.options = Options()
         cls.options.add_argument("--start-maximized")
 
-        driver = webdriver.Chrome(options=cls.options)
+        cls.driver = webdriver.Chrome(options=cls.options)
         cls.driver.get(cls.LOGIN_URL)
 
     def test_successful_login(self):
         self.driver.get(self.LOGIN_URL)
         username = self.driver.find_elements(By.CSS_SELECTOR, 'input[ui_test="login-username"]')
         self.assertTrue(username, "Username field not found")
-        username[0].send_keys("soliman")
+        username[0].send_keys(self.USERNAME)
 
         password = self.driver.find_elements(By.CSS_SELECTOR, 'input[ui_test="login-password"]')
         self.assertTrue(password, "Password field not found")
-        password[0].send_keys("123")
+        password[0].send_keys(self.PASSWORD)
         password[0].send_keys(Keys.RETURN)
 
         time.sleep(2)

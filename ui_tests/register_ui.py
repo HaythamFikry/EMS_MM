@@ -7,7 +7,7 @@ from selenium.webdriver.chrome.options import Options
 class TestRegisterForm(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        with open("tests/config.json") as f:
+        with open("ui_tests/config.json") as f:
             cls.config = json.load(f)
             cls.BASE_URL = cls.config["BASE_URL"]
             cls.REGISTER_URL = urllib.parse.urljoin(cls.BASE_URL, cls.config["REGISTER_URL"])
@@ -56,7 +56,7 @@ class TestRegisterForm(unittest.TestCase):
         )
         print("created user:", username, email, password, role)
         self.config["CREATED_USER_ATTENDEE"] = {"username": username, "email": email, "password": password,"role": role}
-        with open("tests/config.json", "w") as f:
+        with open("ui_tests/config.json", "w") as f:
             json.dump(self.config, f, indent=4)
 
 
@@ -98,7 +98,7 @@ class TestRegisterForm(unittest.TestCase):
         )
         print("created user:", username, email, password,role)
         self.config["CREATED_USER_ORGANIZER"] = {"username": username, "email": email, "password": password,"role": role}
-        with open("tests/config.json", "w") as f:
+        with open("ui_tests/config.json", "w") as f:
             json.dump(self.config, f, indent=4)
 
     @classmethod
